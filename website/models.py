@@ -22,3 +22,6 @@ class Member(models.Model):
     picture       = models.ImageField(blank=True)
     join_date     = models.DateField(auto_now_add=True, editable=True)
     graduate_date = models.DateField(null=True, blank=True)
+
+    def __str__(self):
+        return self.name

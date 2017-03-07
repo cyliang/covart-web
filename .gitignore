@@ -96,3 +96,8 @@ ENV/
 # Sqlite database
 *.sqlite
 *.sqlite3
+
+# Temp and backup file
+*.swp
+*.swo
+*~
