@@ -1,8 +1,16 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.conf import settings
+from datetime import date, timedelta
 
 class PresentRotation(models.Model):
+    """
+    A ring buffer storing a fixed order of presenters for each meeting type.
+    Adjust the attribute `order` to reorder the rotation. The rotation with
+    smaller `order` goes first.
+    """
+
     order     = models.IntegerField(unique=True)
     presenter = models.OneToOneField('website.Member', models.CASCADE)
     join_date = models.DateField(auto_now_add=True)
@@ -13,8 +21,43 @@ class PresentRotation(models.Model):
     def __str__(self):
         return "%d: %s" % (self.order, self.presenter)
 
+    @classmethod
+    def add_person_after(cls, member, after_rotation):
+        """
+        Insert a member originally not in the rotation with a desired order.
+        return: The newly created `PresentRotation`.
+        member: The `Member` to insert into the rotation.
+        after_rotation: The `PresentRotation` to insert after.
+        """
+
+        order = after_rotation.order
+
+        if cls.objects.get(order=order+1):
+            for rotation in cls.objects.filter(order__gt=order).order_by('-order'):
+                rotation.order += 1
+                rotation.save()
+
+        return cls.objects.create(order=order+1, presenter=member)
+
+    def get_after(self):
+        """
+        Get next rotation of current rotation.
+        """
+
+        manager = self.__class__.objects
+        after   = manager.filter(order__gt=self.order).order_by('order')[:1]
+
+        if len(after) == 1:
+            return after[0]
+        else:
+            return manager.all().order_by('order')[0]
+
 
 class MeetingHistory(models.Model):
+    """
+    The history for past meetings and one coming meeting.
+    """
+
     PAPER_PRESENTATION = "PAPER"
     PROGRESS_REPORT    = "PROGRESS"
     type_choices = (
@@ -31,6 +74,41 @@ class MeetingHistory(models.Model):
 
     def __str__(self):
         return "%s %s" % (str(self.date), self.get_present_type_display())
+
+    @classmethod
+    def rotate_next_meeting(cls):
+        """
+        Generate the coming meeting on the specified `MEETING_DAY` and add
+        `PresentHistory` for that meeting.
+        return: Next coming `MeetingHistory`.
+        """
+
+        today          = date.today()
+        future_meeting = cls.objects.filter(date__gt=today)[:1]
+        if len(future_meeting) == 1:
+            return future_meeting[0]
+
+        next_meeting_day = today + timedelta(
+            days=7 + (settings.MEETING_DAY - today.weekday()) % -7
+        )
+        last_meeting_of_same_type = cls.objects.all()[1:2][0]
+
+        next_rotation1 = last_meeting_of_same_type.last_rotation.get_after()
+        next_rotation2 = next_rotation1.get_after()
+
+        next_meeting = cls.objects.create(
+            date          = next_meeting_day,
+            present_type  = last_meeting_of_same_type.present_type,
+            last_rotation = next_rotation2,
+        )
+
+        for presenter in (next_rotation1, next_rotation2):
+            PresentHistory.objects.create(
+                presenter = presenter.presenter,
+                meeting   = next_meeting,
+            )
+
+        return next_meeting
 
 
 class PresentHistory(models.Model):
