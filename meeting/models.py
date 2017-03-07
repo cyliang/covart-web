@@ -18,7 +18,7 @@ class PresentRotation(models.Model):
     class Meta:
         ordering = ['order']
 
-    def __str__(self):
+    def __unicode__(self):
         return "%d: %s" % (self.order, self.presenter)
 
     @classmethod
@@ -72,8 +72,8 @@ class MeetingHistory(models.Model):
     class Meta:
         ordering = ['-date']
 
-    def __str__(self):
-        return "%s %s" % (str(self.date), self.get_present_type_display())
+    def __unicode__(self):
+        return "%s %s" % (unicode(self.date), self.get_present_type_display())
 
     @classmethod
     def rotate_next_meeting(cls):
@@ -119,5 +119,5 @@ class PresentHistory(models.Model):
     class Meta:
         ordering = ['meeting']
 
-    def __str__(self):
-        return "%s: %s" % (str(self.meeting), str(self.presenter))
+    def __unicode__(self):
+        return "%s: %s" % (unicode(self.meeting), unicode(self.presenter))

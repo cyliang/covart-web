@@ -23,5 +23,8 @@ class Member(models.Model):
     join_date     = models.DateField(auto_now_add=True, editable=True)
     graduate_date = models.DateField(null=True, blank=True)
 
-    def __str__(self):
+    def graduate_year(self):
+        return self.graduate_date.year if self.graduate_date else None
+
+    def __unicode__(self):
         return self.name
