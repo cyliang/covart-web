@@ -15,11 +15,24 @@
             <a class="image item">
                 <img class="ts tiny image" src="{% static "website/logo-stripped.png" %}">
             </a>
-            <a class="item">Meeting</a>
+            <div class="ts item dropdown">
+                <div class="text">Meeting</div>
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                    <a class="item" href="{% url 'meeting:schedule' %}">Schedule</a>
+                    <a class="item" href="{% url 'meeting:history' %}">History</a>
+                </div>
+            </div>
             <a class="item">Members</a>
         </div>
     </div>
 
     {% block content %}{% endblock %}
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tocas-ui/2.3.2/tocas.js"></script>
+    <script>
+    ts('.ts.dropdown:not(.basic)').dropdown();
+    </script>
+    {% block script %}{% endblock %}
 </body>
 </html>

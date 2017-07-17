@@ -5,7 +5,7 @@
     {{ block.super }}
 
     <div class="ts container">
-        <h3>Upcoming Presenter</h3>
+        <h4>Upcoming Presenter</h4>
         <div class="ts grid">
             <div class="right floated column">
                 <div class="ts rounded calendar">
@@ -16,10 +16,11 @@
                 </div>
             </div>
         </div>
-        <div class="ts five column centered relaxed grid">
-        {% for presenter in upcoming.presenter %}
+        <div class="ts two column stackable centered grid">
             <div class="column">
-                <div class="ts card {{ upcoming.type_attr }}">
+            <div class="ts two cards">
+        {% for presenter in upcoming.presenter %}
+                <div class="ts raised {{ upcoming.type_attr }} card">
                     <div class="image">
                         <img src="{{ presenter.picture.url }}">
                     </div>
@@ -31,11 +32,12 @@
                         </div>
                     </div>
                 </div>
-            </div>
         {% endfor %}
+            </div>
+            </div>
         </div>
 
-        <h3>Future Schedule</h3>
+        <h4>Future Schedule</h4>
         {% render_table table %}
     </div>
 {% endblock %}

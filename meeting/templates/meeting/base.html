@@ -1,11 +1,7 @@
 {% extends "base.html" %}
+
 {% block content %}
-{% with url_name=request.resolver_match.url_name %}
     <div class="ts container">
-        <div class="ts tabbed menu">
-            <a class="item{% ifequal url_name 'schedule' %} active{% endifequal %}" href="{% url 'meeting:schedule' %}">Schedule</a>
-            <a class="item{% ifequal url_name 'history' %} active{% endifequal %}" href="{% url 'meeting:history' %}">History</a>
-        </div>
+        <h2 class="ts dividing header">Meeting Schedule</h2>
     </div>
-{% endwith %}
 {% endblock %}
