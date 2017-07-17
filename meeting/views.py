@@ -40,3 +40,18 @@ class ScheduleView(SingleTableView):
                     }]
 
         return result
+
+    def get_context_data(self, **kwargs):
+        context = super(ScheduleView, self).get_context_data(**kwargs)
+
+        meeting = models.MeetingHistory.objects.all()[0]
+        context['upcoming'] = {
+            'presenter': map(
+                lambda p: p.presenter,
+                models.PresentHistory.objects.filter(meeting=meeting)
+            ),
+            'present_type': meeting.get_present_type_display(),
+            'date': meeting.date,
+            'type_attr': 'info' if meeting.present_type == models.MeetingHistory.type_choices[0][0] else 'negative',
+        }
+        return context

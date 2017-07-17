@@ -1,9 +1,41 @@
 {% extends 'meeting/base.html' %}
+{% load render_table from django_tables2 %}
+
 {% block content %}
     {{ block.super }}
 
     <div class="ts container">
-        {% load render_table from django_tables2 %}
+        <h3>Upcoming Presenter</h3>
+        <div class="ts grid">
+            <div class="right floated column">
+                <div class="ts rounded calendar">
+                    <div class="header">{{ upcoming.date|date:"M" }}</div>
+                    <div class="content">
+                        <div class="date">{{ upcoming.date|date:"d" }}</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="ts five column centered relaxed grid">
+        {% for presenter in upcoming.presenter %}
+            <div class="column">
+                <div class="ts card {{ upcoming.type_attr }}">
+                    <div class="image">
+                        <img src="{{ presenter.picture.url }}">
+                    </div>
+                    <div class="content">
+                        <div class="header">{{ presenter.name }}</div>
+                        <div class="meta">{{ presenter.email }}</div>
+                        <div class="description">
+                            <p>{{ upcoming.present_type }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
+
+        <h3>Future Schedule</h3>
         {% render_table table %}
     </div>
 {% endblock %}
