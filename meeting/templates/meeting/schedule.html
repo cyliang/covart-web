@@ -1,44 +1,17 @@
 {% extends 'meeting/base.html' %}
 {% load render_table from django_tables2 %}
-{% load static %}
 
 {% block content %}
     {{ block.super }}
 
     <div class="ts container">
-        <h4>Upcoming Presenter</h4>
+        <h4>Upcoming Presenters</h4>
+        {% include 'meeting/cards-calendar.html' with presentations=upcoming.presentations meeting=upcoming.meeting %}
         <div class="ts grid">
             <div class="right floated column">
-                <div class="ts rounded calendar">
-                    <div class="header">{{ upcoming.date|date:"M" }}</div>
-                    <div class="content">
-                        <div class="date">{{ upcoming.date|date:"d" }}</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="ts two column stackable centered grid">
-            <div class="column">
-            <div class="ts two cards">
-        {% for presenter in upcoming.presenter %}
-                <div class="ts raised {{ upcoming.type_attr }} card">
-                    <div class="image">
-                        {% if presenter.picture != '' %}
-                        <img src="{{ presenter.picture.url }}">
-                        {% else %}
-                        <img src="{% static 'website/unknown-person.png' %}">
-                        {% endif %}
-                    </div>
-                    <div class="content">
-                        <div class="header">{{ presenter.name }}</div>
-                        <div class="meta">{{ presenter.email }}</div>
-                        <div class="description">
-                            <p>{{ upcoming.present_type }}</p>
-                        </div>
-                    </div>
-                </div>
-        {% endfor %}
-            </div>
+                <a class="ts primary button" href="{% url 'meeting:detail' upcoming.meeting.date %}">
+                    Detail<i class="angle double right icon"></i>
+                </a>
             </div>
         </div>
 

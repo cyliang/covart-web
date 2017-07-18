@@ -1,5 +1,6 @@
 import django_tables2 as tables
-from django.utils.text import Truncator
+from django_tables2 import A
+from django.urls import reverse
 from . import models
 
 class ScheduleTable(tables.Table):
@@ -26,10 +27,13 @@ class HistoryTable(tables.Table):
 
     class Meta:
         orderable = False
-        attrs = {'class': 'ts fixed single line table'}
+        attrs = {'class': 'ts selectable fixed single line table'}
         row_attrs = {
-            'class': lambda record: 'indicated ' + (
+            'class': lambda record: 'clickable indicated ' + (
                 'info' if record.meeting.present_type == models.MeetingHistory.type_choices[0][0]
                 else 'negative'
-            )
+            ),
+            'onclick': lambda record: "window.location='%s';" % reverse(
+                'meeting:detail', args=[record.meeting.date]
+            ),
         }
