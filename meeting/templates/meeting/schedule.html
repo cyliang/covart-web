@@ -1,5 +1,6 @@
 {% extends 'meeting/base.html' %}
 {% load render_table from django_tables2 %}
+{% load static %}
 
 {% block content %}
     {{ block.super }}
@@ -22,7 +23,11 @@
         {% for presenter in upcoming.presenter %}
                 <div class="ts raised {{ upcoming.type_attr }} card">
                     <div class="image">
+                        {% if presenter.picture != '' %}
                         <img src="{{ presenter.picture.url }}">
+                        {% else %}
+                        <img src="{% static 'website/unknown-person.png' %}">
+                        {% endif %}
                     </div>
                     <div class="content">
                         <div class="header">{{ presenter.name }}</div>

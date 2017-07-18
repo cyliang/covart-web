@@ -24,12 +24,9 @@ class HistoryTable(tables.Table):
     presenter = tables.Column()
     content = tables.Column()
 
-    def render_content(self, value):
-        return Truncator(value).chars(20)
-
     class Meta:
         orderable = False
-        attrs = {'class': 'ts table'}
+        attrs = {'class': 'ts fixed single line table'}
         row_attrs = {
             'class': lambda record: 'indicated ' + (
                 'info' if record.meeting.present_type == models.MeetingHistory.type_choices[0][0]

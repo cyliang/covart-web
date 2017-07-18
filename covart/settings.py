@@ -125,3 +125,4 @@ MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 MEETING_DAY = 0 # 0 for Monday
+DJANGO_TABLES2_TEMPLATE = 'table-base.html'
