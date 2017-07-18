@@ -4,7 +4,7 @@ from . import views
 
 urlpatterns = [
     url(r'^schedule$', views.ScheduleView.as_view(), name='schedule'),
-    url(r'^history$', TemplateView.as_view(template_name='meeting/base.html'), name='history'),
+    url(r'^history$', views.HistoryView.as_view(), name='history'),
     url(r'^$', RedirectView.as_view(pattern_name='meeting:schedule')),
 ]
 

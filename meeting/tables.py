@@ -1,4 +1,5 @@
 import django_tables2 as tables
+from django.utils.text import Truncator
 from . import models
 
 class ScheduleTable(tables.Table):
@@ -12,6 +13,26 @@ class ScheduleTable(tables.Table):
         row_attrs = {
             'class': lambda record: 'indicated ' + (
                 'info' if record['present_type'] == models.MeetingHistory.type_choices[0][1]
+                else 'negative'
+            )
+        }
+
+
+class HistoryTable(tables.Table):
+    date = tables.DateColumn(accessor='meeting.date')
+    present_type = tables.Column(verbose_name='Type', accessor='meeting.get_present_type_display')
+    presenter = tables.Column()
+    content = tables.Column()
+
+    def render_content(self, value):
+        return Truncator(value).chars(20)
+
+    class Meta:
+        orderable = False
+        attrs = {'class': 'ts table'}
+        row_attrs = {
+            'class': lambda record: 'indicated ' + (
+                'info' if record.meeting.present_type == models.MeetingHistory.type_choices[0][0]
                 else 'negative'
             )
         }

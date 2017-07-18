@@ -55,3 +55,10 @@ class ScheduleView(SingleTableView):
             'type_attr': 'info' if meeting.present_type == models.MeetingHistory.type_choices[0][0] else 'negative',
         }
         return context
+
+class HistoryView(SingleTableView):
+    table_class = tables.HistoryTable
+    template_name = 'meeting/history.html'
+
+    def get_queryset(self):
+        return models.PresentHistory.objects.order_by('meeting')[2:]
