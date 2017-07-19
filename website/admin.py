@@ -11,3 +11,8 @@ class MemberAdmin(admin.ModelAdmin):
 @admin.register(models.Activity)
 class ActivityAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("title",)}
+
+
+@admin.register(models.Publication)
+class PublicationAdmin(admin.ModelAdmin):
+    prepopulated_fields = {'slug': ('title',)}

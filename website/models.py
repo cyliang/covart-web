@@ -53,3 +53,19 @@ class Activity(models.Model):
 
     def __unicode__(self):
         return self.title
+
+
+class Publication(models.Model):
+    authors    = models.CharField(max_length=255)
+    title      = models.CharField(max_length=255)
+    slug       = models.SlugField()
+    date       = models.DateField()
+    at         = models.CharField(max_length=255)
+    index      = models.CharField(max_length=255, blank=True)
+    best_paper = models.BooleanField(default=False)
+
+    class Meta:
+        ordering = ['-date']
+
+    def __unicode__(self):
+        return self.title

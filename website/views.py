@@ -8,5 +8,6 @@ class IndexView(TemplateView):
         context = super(IndexView, self).get_context_data(**kwargs)
 
         context['activities'] = models.Activity.objects.all()[:4]
+        context['publications'] = models.Publication.objects.all()[:5]
 
         return context
