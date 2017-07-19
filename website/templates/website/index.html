@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="ts tablet or large screen only fluid bottom attached vertically extra padded massive heading slate">
+        <div class="image">
+            <img src="{% static 'website/cover.png' %}">
+        </div>
+        <div class="ts narrow container">
+            <div class="header">
+                Covart Lab
+            </div>
+            <div class="description">
+                Compiler Optimization, Virtualization, and Adaptive Runtime
+            </div>
+        </div>
+    </div>
+    <div class="ts mobile only fluid bottom attached vertically padded large heading slate">
+        <div class="image">
+            <img src="{% static 'website/cover.png' %}">
+        </div>
+        <div class="header">
+            Covart Lab
+        </div>
+        <div class="description">
+            Compiler Optimization, Virtualization, and Adaptive Runtime
+        </div>
+    </div>
+
+    <div class="ts container">
+        <h3 class="ts dividing header">Recent Activities</h3>
+        <h3 class="ts dividing header">Publications</h3>
+    </div>
+{% endblock %}

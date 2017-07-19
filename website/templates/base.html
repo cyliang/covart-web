@@ -10,9 +10,14 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocas-ui/2.3.2/tocas.css">
 </head>
 <body>
+    {% block menu %}
+    {% if request.resolver_match.view_name != 'website:index' %}
     <div class="ts raised menu">
+    {% else %}
+    <div class="ts attached inverted menu">
+    {% endif %}
         <div class="ts container">
-            <a class="image item">
+            <a class="image item" href="{% url 'website:index' %}">
                 <img class="ts tiny image" src="{% static "website/logo-stripped.png" %}">
             </a>
             <div class="ts item dropdown">
@@ -27,6 +32,7 @@
             <a class="right item" href="{% url 'admin:index' %}">Admin</a>
         </div>
     </div>
+    {% endblock %}
 
     {% block content %}{% endblock %}
 
