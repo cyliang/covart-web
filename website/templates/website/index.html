@@ -50,26 +50,11 @@
 
         <h3 class="ts dividing header">Recent Activities</h3>
         <div class="ts doubling four cards">
-        {% for activity in activities %}
-            <a class="ts raised card" href="{% url 'website:activity-detail' activity.slug %}">
-                {% if activity.picture != "" %}
-                <div class="image">
-                    <img src="{{ activity.picture.url }}">
-                </div>
-                {% endif %}
-                <div class="content">
-                    <div class="header">{{ activity.title }}</div>
-                    <div class="meta">{{ activity.post_time }}</div>
-                    <div class="description">
-                        {{ activity.content|truncatechars:100 }}
-                    </div>
-                </div>
-            </a>
-        {% endfor %}
+            {% include 'website/activity-items.html' %}
         </div>
         <div class="ts grid">
             <div class="right floated column">
-                <a class="ts primary button">
+                <a class="ts primary button" href="{% url 'website:activities' %}">
                     More <i class="angle double right icon"></i>
                 </a>
             </div>

@@ -1,0 +1,16 @@
+{% for activity in activities %}
+    <a class="ts raised card" href="{% url 'website:activity-detail' activity.slug %}">
+        {% if activity.picture != "" %}
+        <div class="image">
+            <img src="{{ activity.picture.url }}">
+        </div>
+        {% endif %}
+        <div class="content">
+            <div class="header">{{ activity.title }}</div>
+            <div class="meta">{{ activity.post_time|date }}</div>
+            <div class="description">
+                {{ activity.content|truncatechars:100 }}
+            </div>
+        </div>
+    </a>
+{% endfor %}

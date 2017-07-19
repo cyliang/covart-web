@@ -18,6 +18,11 @@ class PublicationListView(ListView):
     template_name = 'website/publication-list.html'
 
 
+class ActivityListView(ListView):
+    model = models.Activity
+    template_name = 'website/activity-list.html'
+
+
 class ActivityDetailView(DetailView):
     model = models.Activity
     template_name = 'website/activity-detail.html'
