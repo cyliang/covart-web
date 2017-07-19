@@ -1,4 +1,4 @@
-from django.views.generic import TemplateView, ListView
+from django.views.generic import TemplateView, ListView, DetailView
 from . import models
 
 class IndexView(TemplateView):
@@ -16,3 +16,8 @@ class IndexView(TemplateView):
 class PublicationListView(ListView):
     model = models.Publication
     template_name = 'website/publication-list.html'
+
+
+class ActivityDetailView(DetailView):
+    model = models.Activity
+    template_name = 'website/activity-detail.html'

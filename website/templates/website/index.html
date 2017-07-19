@@ -51,7 +51,7 @@
         <h3 class="ts dividing header">Recent Activities</h3>
         <div class="ts doubling four cards">
         {% for activity in activities %}
-            <a class="ts raised card">
+            <a class="ts raised card" href="{% url 'website:activity-detail' activity.slug %}">
                 {% if activity.picture != "" %}
                 <div class="image">
                     <img src="{{ activity.picture.url }}">
