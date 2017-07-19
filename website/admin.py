@@ -1,8 +1,13 @@
 from django.contrib import admin
 
-from .models import Member
+from . import models
 
-@admin.register(Member)
+@admin.register(models.Member)
 class MemberAdmin(admin.ModelAdmin):
     list_display = ('name', 'identity', 'graduate_year')
     list_filter = ('graduate_date', 'identity')
+
+
+@admin.register(models.Activity)
+class ActivityAdmin(admin.ModelAdmin):
+    prepopulated_fields = {"slug": ("title",)}
