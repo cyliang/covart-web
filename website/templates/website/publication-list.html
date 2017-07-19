@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="ts container">
+        <h2 class="ts dividing header">Publications</h2>
+
+        {% regroup object_list by date.year as pub_years %}
+        {% for pub_year in pub_years %}
+            <h3>{{ pub_year.grouper }}</h3>
+
+            <div class="ts selection items">
+                {% include 'website/publication-items.html' with publications=pub_year.list %}
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}

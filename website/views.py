@@ -1,4 +1,4 @@
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, ListView
 from . import models
 
 class IndexView(TemplateView):
@@ -11,3 +11,8 @@ class IndexView(TemplateView):
         context['publications'] = models.Publication.objects.all()[:5]
 
         return context
+
+
+class PublicationListView(ListView):
+    model = models.Publication
+    template_name = 'website/publication-list.html'

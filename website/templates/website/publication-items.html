@@ -1,0 +1,17 @@
+{% for publication in publications %}
+    <a class="item" href="https://scholar.google.com/scholar?q={{ publication.title|urlencode }}" target="_blank">
+        <div class="content">
+            <div class="header">{{ publication.title }}</div>
+            <div class="description">{{ publication.authors }}</div>
+            <div class="extra">{{ publication.at }} '{{ publication.date|date:"y" }}</div>
+            {% if publication.best_paper %}
+            <div class="extra">
+                <div class="ts positive label">Best paper award</div>
+            </div>
+            {% endif %}
+        </div>
+        <div class="middle aligned actions">
+            <i class="big circle arrow right info icon"></i>
+        </div>
+    </a>
+{% endfor %}

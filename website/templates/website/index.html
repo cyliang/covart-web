@@ -77,27 +77,11 @@
 
         <h3 class="ts dividing header">Publications</h3>
         <div class="ts single line selection items">
-        {% for publication in publications %}
-            <a class="item">
-                <div class="content">
-                    <div class="header">{{ publication.title }}</div>
-                    <div class="description">{{ publication.authors }}</div>
-                    <div class="extra">{{ publication.at }} '{{ publication.date|date:"y" }}</div>
-                    {% if publication.best_paper %}
-                    <div class="extra">
-                        <div class="ts positive label">Best paper award</div>
-                    </div>
-                    {% endif %}
-                </div>
-                <div class="middle aligned actions">
-                    <i class="big circle arrow right info icon"></i>
-                </div>
-            </a>
-        {% endfor %}
+            {% include 'website/publication-items.html' %}
         </div>
         <div class="ts grid">
             <div class="right floated column">
-                <a class="ts primary button">
+                <a class="ts primary button" href="{% url 'website:publications' %}">
                     More <i class="angle double right icon"></i>
                 </a>
             </div>

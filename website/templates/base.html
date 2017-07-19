@@ -21,6 +21,14 @@
                 <img class="ts tiny image" src="{% static "website/logo-stripped.png" %}">
             </a>
             <div class="ts item dropdown">
+                <div class="text">About</div>
+                <i class="dropdown icon"></i>
+                <div class="menu">
+                    <a class="item">Members</a>
+                    <a class="item" href="{% url 'website:publications' %}">Publications</a>
+                </div>
+            </div>
+            <div class="ts item dropdown">
                 <div class="text">Meeting</div>
                 <i class="dropdown icon"></i>
                 <div class="menu">
@@ -28,8 +36,8 @@
                     <a class="item" href="{% url 'meeting:history' %}">History</a>
                 </div>
             </div>
-            <a class="item">Members</a>
-            <a class="right item" href="{% url 'admin:index' %}">Admin</a>
+            <a class="item">Activities</a>
+            <a class="tablet or large screen only right item" href="{% url 'admin:index' %}">Admin</a>
         </div>
     </div>
     {% endblock %}
