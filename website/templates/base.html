@@ -36,6 +36,25 @@
 
     {% block content %}{% endblock %}
 
+    {% block footer %}
+    <div class="ts top attached borderless tertiary segment">
+    <div class="ts container">
+        <div class="ts grid">
+            <div class="two wide tablet two wide computer four wide mobile column">
+                <img class="ts image" src="{% static 'website/logo.png' %}">
+            </div>
+            <div class="tablet or large device only one wide column"></div>
+            <div class="stretched column" style="margin-top: auto; margin-bottom: auto;">
+                <p>
+                    台北市大安區羅斯福路四段1號 德田館404室<br>
+                    02-33664888 ext. 404
+                </p>
+            </div>
+        </div>
+    </div>
+    </div>
+    {% endblock %}
+
     <script src="https://cdnjs.cloudflare.com/ajax/libs/tocas-ui/2.3.2/tocas.js"></script>
     <script>
     ts('.ts.dropdown:not(.basic)').dropdown();
