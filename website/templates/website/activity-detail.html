@@ -2,6 +2,12 @@
 
 {% block content %}
     <div class="ts container">
+        <div class="ts breadcrumb">
+            <a class="section" href="{% url 'website:activities' %}">Activities</a>
+            <div class="divider"> / </div>
+            <div class="active section">{{ object.title }}</div>
+        </div>
+
         <h2 class="ts dividing header">
             {{ object.title }}
             <div class="sub header">{{ object.post_time }}</div>

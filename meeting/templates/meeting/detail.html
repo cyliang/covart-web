@@ -4,6 +4,19 @@
     {{ block.super }}
 
     <div class="ts container">
+        <div class="ts breadcrumb">
+            {% if object.not_yet_happened %}
+            <a class="section" href="{% url 'meeting:schedule' %}">
+                Meeting schedule
+            {% else %}
+            <a class="section" href="{% url 'meeting:history' %}">
+                Meeting history
+            {% endif %}
+            </a>
+            <div class="divider"> / </div>
+            <div class="active section">{{ object.date }}: {{ object.get_present_type_display }}</div>
+        </div>
+
         <h4>Presenters</h4>
         {% include 'meeting/cards-calendar.html' with meeting=object %}
 

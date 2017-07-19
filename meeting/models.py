@@ -75,6 +75,9 @@ class MeetingHistory(models.Model):
     def __unicode__(self):
         return "%s %s" % (unicode(self.date), self.get_present_type_display())
 
+    def not_yet_happened(self):
+        return self.date > date.today()
+
     @classmethod
     def rotate_next_meeting(cls):
         """
