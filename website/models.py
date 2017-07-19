@@ -9,16 +9,17 @@ def member_picture_path(instance, filename):
     )
 
 class Member(models.Model):
-    ADVISOR        = "ADVISOR"
-    MS_STUDENT     = "MS"
-    PHD_STUDENT    = "PHD"
-    INTERN_STUDENT = "INTERN"
-    ASSISTANT      = "ASSISTANT"
+    ADVISOR          = "aADVISOR"
+    PHD_STUDENT      = "bPHD"
+    MS_STUDENT       = "cMS"
+    INTERN_STUDENT   = "dINTERN"
+    ASSISTANT        = "eASSISTANT"
+    students         = (PHD_STUDENT, MS_STUDENT, INTERN_STUDENT)
     identity_choices = (
-        (ADVISOR,       "Advisor"),
-        (MS_STUDENT,     "MS student"),
-        (PHD_STUDENT,    "PhD student"),
-        (INTERN_STUDENT, "Intern student"),
+        (ADVISOR,        "Advisor"),
+        (MS_STUDENT,     "Master"),
+        (PHD_STUDENT,    "PhD"),
+        (INTERN_STUDENT, "Intern"),
         (ASSISTANT,      "Assitant"),
     )
 
@@ -28,6 +29,7 @@ class Member(models.Model):
     picture       = models.ImageField(blank=True, upload_to=member_picture_path)
     join_date     = models.DateField(auto_now_add=True, editable=True)
     graduate_date = models.DateField(null=True, blank=True)
+    thesis        = models.CharField(max_length=255, blank=True)
 
     def graduate_year(self):
         return self.graduate_date.year if self.graduate_date else None

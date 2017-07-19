@@ -1,0 +1,70 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+    <div class="ts container">
+        <h2 class="ts dividing header">Members</h2>
+
+        {% regroup object_list|dictsort:'graduate_year' by graduate_year as member_years %}
+        {% for member_year in member_years %}
+            {% if member_year.grouper is None %}
+                {% regroup member_year.list|dictsort:'identity' by identity as member_identities %}
+                {% for member_identity in member_identities %}
+                    <h4>
+                        {{ member_identity.list.0.get_identity_display }}
+                        {% if member_identity.grouper in member_identity.list.0.students %}
+                        Students
+                        {% endif %}
+                    </h4>
+
+                    <div class="ts four doubling cards">
+                    {% for member in member_identity.list %}
+                        <div class="ts card">
+                            <div class="image">
+                                {% if member.picture != '' %}
+                                <img src="{{ member.picture.url }}">
+                                {% else %}
+                                <img src="{% static 'website/unknown-person.png' %}">
+                                {% endif %}
+                            </div>
+                            <div class="content">
+                                <div class="header">{{ member.name }}</div>
+                                <div class="meta">{{ member.email }}</div>
+                            </div>
+                            {% if member.identity != member.identity_choices.0.0 %}
+                            <div class="secondary extra content">Joined {{ member.join_date|timesince }} ago</div>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                    </div>
+                {% endfor %}
+            {% else %}
+                <h4>Graduated Students in {{ member_year.grouper }}</h4>
+
+                <div class="ts divided items">
+                {% for member in member_year.list %}
+                    <div class="item">
+                        <div class="ts tiny image">
+                            {% if member.picture != '' %}
+                            <img src="{{ member.picture.url }}">
+                            {% else %}
+                            <img src="{% static 'website/unknown-person.png' %}">
+                            {% endif %}
+                        </div>
+                        <div class="middle aligned content">
+                            <div class="header">{{ member.name }}</div>
+                            {% if member.email != '' %}
+                            <div class="meta">{{ member.email }}</div>
+                            {% endif %}
+                            {% if member.thesis != '' %}
+                            <div class="description">Thesis: {{ member.thesis }}</div>
+                            {% endif %}
+                        </div>
+                        <div class="ts top right attached positive label">{{ member.get_identity_display }} degree</div>
+                    </div>
+                {% endfor %}
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+{% endblock %}

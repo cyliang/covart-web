@@ -13,6 +13,11 @@ class IndexView(TemplateView):
         return context
 
 
+class MemberListView(ListView):
+    model = models.Member
+    template_name = 'website/member-list.html'
+
+
 class PublicationListView(ListView):
     model = models.Publication
     template_name = 'website/publication-list.html'
