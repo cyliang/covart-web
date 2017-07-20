@@ -34,6 +34,9 @@ class Member(models.Model):
     def graduate_year(self):
         return self.graduate_date.year if self.graduate_date else None
 
+    def graduated(self):
+        return bool(self.graduate_date)
+
     def __unicode__(self):
         return self.name
 

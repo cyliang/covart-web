@@ -5,10 +5,10 @@
     <div class="ts container">
         <h2 class="ts dividing header">Members</h2>
 
-        {% regroup object_list|dictsort:'graduate_year' by graduate_year as member_years %}
-        {% for member_year in member_years %}
-            {% if member_year.grouper is None %}
-                {% regroup member_year.list|dictsort:'identity' by identity as member_identities %}
+        {% regroup object_list|dictsort:'graduated' by graduated as gra_groups %}
+        {% for gra_group in gra_groups %}
+            {% if gra_group.grouper == False %}
+                {% regroup gra_group.list|dictsort:'identity' by identity as member_identities %}
                 {% for member_identity in member_identities %}
                     <h4>
                         {{ member_identity.list.0.get_identity_display }}
@@ -39,6 +39,8 @@
                     </div>
                 {% endfor %}
             {% else %}
+            {% regroup gra_group.list|dictsortreversed:'graduate_year' by graduate_year as member_years %}
+            {% for member_year in member_years %}
                 <h4>Graduated Students in {{ member_year.grouper }}</h4>
 
                 <div class="ts divided items">
@@ -64,6 +66,7 @@
                     </div>
                 {% endfor %}
                 </div>
+            {% endfor %}
             {% endif %}
         {% endfor %}
     </div>
