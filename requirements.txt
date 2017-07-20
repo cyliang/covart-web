@@ -1,3 +1,4 @@
 Django==1.10.6
 django-tables2==1.10.0
 Pillow==4.0.0
+requests==2.18.1

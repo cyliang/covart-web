@@ -1,7 +1,9 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from django.utils.text import slugify
 from time import time
+import requests
 
 def member_picture_path(instance, filename):
     return 'member_pictures/%d-%d-%s' % (
@@ -64,13 +66,46 @@ class Publication(models.Model):
     authors    = models.CharField(max_length=255)
     title      = models.CharField(max_length=255)
     slug       = models.SlugField()
-    date       = models.DateField()
-    at         = models.CharField(max_length=255)
-    index      = models.CharField(max_length=255, blank=True)
+    paper_type = models.CharField(max_length=255, blank=True)
+    year       = models.IntegerField()
+    venue      = models.CharField(max_length=255)
+    pages      = models.CharField(max_length=255, blank=True)
+    dblp_key   = models.CharField(max_length=255, blank=True)
     best_paper = models.BooleanField(default=False)
 
     class Meta:
-        ordering = ['-date']
+        ordering = ['-year']
 
     def __unicode__(self):
         return self.title
+
+    @classmethod
+    def get_from_keyword(cls, keyword):
+        r = requests.get('http://dblp.uni-trier.de/search/publ/api', {
+            'q': keyword,
+            'h': 1000,
+            'format': 'json'
+        })
+
+        try:
+            result = r.json()['result']
+        except ValueError:
+            pass
+        finally:
+            if result['status']['@code'] == '200' and (result['hits']['@total'] == '1'
+                    or int(result['hits']['@total']) > 0 and 'Wei-Chung Hsu' in result['hits']['hit'][0]['info']['authors']['author']):
+                info = result['hits']['hit'][0]['info']
+
+                obj = cls()
+                obj.authors = ', '.join(info['authors']['author'])
+                obj.title = info['title']
+                obj.venue = info['venue']
+                obj.pages = info.get('pages', '')
+                obj.year = int(info['year'])
+                obj.paper_type = info['type']
+                obj.dblp_key = info['key']
+                obj.slug = slugify(obj.title)[:50]
+
+                return obj
+
+        return None
