@@ -68,6 +68,11 @@ class MeetingHistory(models.Model):
     date          = models.DateField(unique=True)
     present_type  = models.CharField(max_length=10, choices=type_choices)
     last_rotation = models.ForeignKey('PresentRotation', models.SET_NULL, null=True)
+    presenters    = models.ManyToManyField(
+        'website.Member',
+        through='PresentHistory',
+        through_fields=('meeting', 'presenter'),
+    )
 
     class Meta:
         ordering = ['-date']
