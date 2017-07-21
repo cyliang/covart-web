@@ -1,0 +1,82 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocas-ui/2.3.2/tocas.css">
+    <title>{{ meeting.date|date:'y/m' }} Group Meeting Notification</title>
+</head>
+
+<body>
+
+<div class="ts very narrow container">
+    <h2 class="ts dividing header">Group Meeting Notification</h2>
+
+    {% if meeting.present_type == meeting.type_choices.0.0 %}
+    <label class="ts left floated tiny info left icon label">
+        <i class="computer icon"></i>
+    {% else %}
+    <label class="ts left floated tiny negative left icon label">
+        <i class="book icon"></i>
+    {% endif %}
+        {{ meeting.get_present_type_display }}
+    </label>
+
+    <div class="ts grid">
+        <div class="right floated column">
+            <div class="ts rounded calendar">
+                <div class="header">{{ meeting.date|date:"M" }}</div>
+                <div class="content">
+                    <div class="date">{{ meeting.date|date:"d" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="ts two column stackable centered grid">
+        <div class="column">
+            <div class="ts two cards">
+            {% for presenter in presenters %}
+                {% if meeting.present_type == meeting.type_choices.0.0 %}
+                <div class="ts raised info card">
+                {% else %}
+                <div class="ts raised negative card">
+                {% endif %}
+                    <div class="image">
+                        {% if presenter.picture != '' %}
+                        <img src="{{ base_url }}{{ presenter.picture.url }}">
+                        {% else %}
+                        <img src="{{ base_url }}{% static 'website/unknown-person.png' %}">
+                        {% endif %}
+                    </div>
+                    <div class="content">
+                        <div class="header">{{ presenter.name }}</div>
+                        <div class="meta">{{ presenter.email }}</div>
+                        <div class="description">
+                            <p>{{ meeting.get_present_type_display }}</p>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="ts top attached segment">
+        The next group meeting for {{ meeting.get_present_type_display|lower }}
+        will be held on {{ meeting.date }}.
+        Presenters will be {{ presenters|join:' and ' }}.
+    </div>
+
+    <div class="ts fluid bottom attached buttons">
+        <a class="ts primary button" href="{{ base_url }}{% url 'meeting:detail' meeting.date %}">
+            Detail
+        </a>
+        <a class="ts positive button" href="{{ base_url }}{% url 'meeting:schedule' %}">
+            Full Schedule
+        </a>
+    </div>
+</div>
+
+</body>
+</html>
