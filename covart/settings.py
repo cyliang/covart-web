@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_tables2',
+    'django_q',
     'website',
     'meeting',
 ]
@@ -126,6 +127,12 @@ MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
 MEETING_DAY = 0 # 0 for Monday
 DJANGO_TABLES2_TEMPLATE = 'table-base.html'
+
+Q_CLUSTER = {
+    'name': 'MeetingUpdater',
+    'workers': 1,
+    'orm': 'default',
+}
 
 try:
     from local_settings import *
