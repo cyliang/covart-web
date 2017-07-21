@@ -129,7 +129,6 @@ MEETING_DAY = 0 # 0 for Monday
 DJANGO_TABLES2_TEMPLATE = 'table-base.html'
 
 DEFAULT_FROM_EMAIL = 'Lab404 <covart.csie.org@gmail.com>'
-AUTO_EMAIL_TO = ['covartcsieorg@googlegroups.com']
 
 Q_CLUSTER = {
     'name': 'MeetingUpdater',
