@@ -16,3 +16,6 @@ class ActivityAdmin(admin.ModelAdmin):
 @admin.register(models.Publication)
 class PublicationAdmin(admin.ModelAdmin):
     prepopulated_fields = {'slug': ('title',)}
+    search_fields = ('title', 'authors')
+    list_filter = ('paper_type', 'year', 'venue', 'best_paper')
+    list_display = ('title', 'authors', 'venue', 'year', 'paper_type')
