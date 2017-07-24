@@ -59,3 +59,8 @@ class ActivityListView(ListView):
 class ActivityDetailView(DetailView):
     model = models.Activity
     template_name = 'website/activity-detail.html'
+
+
+class LinkListView(ListView):
+    model = models.InternalLink
+    template_name = 'website/link-list.html'

@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    Internal Links
+{% endblock %}
+
+{% block content %}
+    <div class="ts container">
+        <h2 class="ts dividing header">Internal Links</h2>
+
+        <div class="ts link items">
+        {% for link in object_list %}
+            <a class="item" href="{{ link.link }}" target="_blank">
+                <div class="content">
+                    <div class="header">{{ link.title }}</div>
+                    <div class="meta">{{ link.help_text }}</div>
+                    <div class="description">{{ link.link }}</div>
+                    <div class="extra">Updated {{ link.update_time|timesince }} ago</div>
+                </div>
+
+                <div class="middle aligned actions">
+                    <i class="big circle arrow right positive icon"></i>
+                </div>
+            </a>
+        {% endfor %}
+        </div>
+    </div>
+{% endblock %}

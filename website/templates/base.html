@@ -37,7 +37,6 @@
                 </div>
             </div>
             <a class="item" href="{% url 'website:activities' %}">Activities</a>
-            <a class="tablet or large device only right item" href="{% url 'admin:index' %}">Admin</a>
         </div>
     </div>
     {% endblock %}
@@ -57,6 +56,18 @@
                     台北市大安區羅斯福路四段1號 德田館404室<br>
                     02-33664888 ext. 404
                 </p>
+            </div>
+            <div class="tablet or large device only column" style="margin-top: auto; margin-bottom: auto;">
+                <div class="ts very compact mini separated buttons">
+                    <a class="ts basic button" href="{% url 'website:links' %}">Links (Internal use)</a>
+                    <a class="ts basic negative button" href="{% url 'admin:index' %}">Admin</a>
+                </div>
+            </div>
+            <div class="mobile only sixteen wide column">
+                <div class="ts very compact mini fluid separated buttons">
+                    <a class="ts basic button" href="{% url 'website:links' %}">Links (Internal use)</a>
+                    <a class="ts basic negative button" href="{% url 'admin:index' %}">Admin</a>
+                </div>
             </div>
         </div>
     </div>

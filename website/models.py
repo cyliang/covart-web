@@ -109,3 +109,16 @@ class Publication(models.Model):
                 return obj
 
         return None
+
+
+class InternalLink(models.Model):
+    title       = models.CharField(max_length=255)
+    help_text   = models.CharField(max_length=255, blank=True)
+    link        = models.URLField()
+    update_time = models.DateTimeField(auto_now=True, editable=True)
+
+    class Meta:
+        ordering = ['-update_time']
+
+    def __unicode__(self):
+        return self.title

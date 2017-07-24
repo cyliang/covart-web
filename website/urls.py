@@ -8,6 +8,7 @@ urlpatterns = [
     url(r'^publication/import$', views.PublicationImportView.as_view(), name='publication-import'),
     url(r'^activity/?$', views.ActivityListView.as_view(), name='activities'),
     url(r'^activity/(?P<slug>[-\w]+)$', views.ActivityDetailView.as_view(), name='activity-detail'),
+    url(r'^links$', views.LinkListView.as_view(), name='links'),
 ]
 
 app_name = 'website'
