@@ -1,0 +1,9 @@
+<p>
+There will be <strong>no</strong> group meeting next week ({{ postponed_date }}){{ reason|lower }}. The next group meeting for <strong>{{ meeting.get_present_type_display|lower }}</strong> has been postponed to {{ meeting.date }}. Presenters will be {{ presenters|join:' and ' }}.
+</p>
+<p>
+Click the following link for further detail:<br>
+<a href="{{ base_url }}{% url 'meeting:schedule' %}">
+    {{ base_url }}{% url 'meeting:schedule' %}
+</a>
+
