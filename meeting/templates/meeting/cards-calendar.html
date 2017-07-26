@@ -13,8 +13,7 @@
 <div class="ts two column stackable centered grid">
     <div class="column">
     <div class="ts two cards">
-    {% for presentation in presentations %}
-        {% with presenter=presentation.presenter %}
+    {% for presenter in meeting.presenters.all %}
         {% if meeting.present_type == meeting.type_choices.0.0 %}
         <div class="ts raised info card">
         {% else %}
@@ -35,7 +34,6 @@
                 </div>
             </div>
         </div>
-        {% endwith %}
     {% endfor %}
     </div>
     </div>

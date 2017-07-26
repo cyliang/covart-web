@@ -1,13 +1,13 @@
 from django.contrib import admin
 
-from .models import PresentRotation, MeetingHistory, PresentHistory
+from . import models
 
-@admin.register(PresentRotation)
+@admin.register(models.PresentRotation)
 class RotationAdmin(admin.ModelAdmin):
     list_display = ('order', 'presenter')
 
-admin.site.register(MeetingHistory)
+admin.site.register(models.MeetingHistory)
 
-@admin.register(PresentHistory)
+@admin.register(models.PresentHistory)
 class PresentAdmin(admin.ModelAdmin):
     list_display = ('__unicode__', 'content')

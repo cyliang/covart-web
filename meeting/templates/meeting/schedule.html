@@ -6,10 +6,10 @@
 
     <div class="ts container">
         <h4>Upcoming Presenters</h4>
-        {% include 'meeting/cards-calendar.html' with presentations=upcoming.presentations meeting=upcoming.meeting %}
+        {% include 'meeting/cards-calendar.html' with meeting=upcoming %}
         <div class="ts grid">
             <div class="right floated column">
-                <a class="ts primary button" href="{% url 'meeting:detail' upcoming.meeting.date %}">
+                <a class="ts primary button" href="{% url 'meeting:detail' upcoming.date %}">
                     Detail<i class="angle double right icon"></i>
                 </a>
             </div>

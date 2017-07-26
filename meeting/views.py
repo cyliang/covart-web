@@ -4,21 +4,32 @@ from datetime import timedelta
 from . import tables, models
 
 class ScheduleView(SingleTableView):
+    """
+    Show the upcoming scheduled meeting specially and other future scheduled
+    meetings in a table.
+    """
     table_class = tables.ScheduleTable
     template_name = 'meeting/schedule.html'
 
     def get_queryset(self):
+        """
+        Generate data (all future meetings) for the table.
+        Since only the exact next meeting is in the database, other future
+        meetings are calculated in the runtime.
+        """
         next_meeting, prev_meeting = models.MeetingHistory.objects.all()[0:2]
 
+        # Get next meeting
         result = [
             {
-                'date': p.meeting.date,
-                'present_type': p.meeting.get_present_type_display(),
-                'presenter': p.presenter
+                'date': next_meeting.date,
+                'present_type': next_meeting.get_present_type_display(),
+                'presenter': presenter
             }
-            for p in models.PresentHistory.objects.filter(meeting=next_meeting)
+            for presenter in next_meeting.presenters.all()
         ]
 
+        # Get other future meetings.
         type1, type2 = [
             [m.get_present_type_display(), m.last_rotation]
             for m in (prev_meeting, next_meeting)
@@ -42,13 +53,14 @@ class ScheduleView(SingleTableView):
         return result
 
     def get_context_data(self, **kwargs):
+        """
+        Append data specially for the upcoming meeting, which has information
+        already stored in the database.
+        """
         context = super(ScheduleView, self).get_context_data(**kwargs)
 
-        meeting = models.MeetingHistory.objects.all()[0]
-        context['upcoming'] = {
-            'presentations': models.PresentHistory.objects.filter(meeting=meeting),
-            'meeting': meeting,
-        }
+        context['upcoming'] = models.MeetingHistory.objects.all()[0]
+
         return context
 
 class HistoryView(SingleTableView):
@@ -64,11 +76,3 @@ class MeetingDetailView(DetailView):
     template_name = 'meeting/detail.html'
     slug_field = 'date'
 
-    def get_context_data(self, **kwargs):
-        context = super(MeetingDetailView, self).get_context_data(**kwargs)
-
-        context['presentations'] = models.PresentHistory.objects.filter(
-            meeting=self.object
-        )
-
-        return context

@@ -21,7 +21,7 @@
         {% include 'meeting/cards-calendar.html' with meeting=object %}
 
         <h4>Presentation Detail</h4>
-        {% for presentation in presentations %}
+        {% for presentation in object.presenthistory_set.all %}
             <h5 class="ts top attached header">
                 {{ presentation.presenter }}
                 <div class="sub header">{{ object.get_present_type_display|title }}</div>
