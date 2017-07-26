@@ -99,8 +99,10 @@ class MeetingHistory(models.Model):
         next_meeting_day = today + timedelta(
             days=7 + (settings.MEETING_DAY - today.weekday()) % -7
         )
-        last_meeting_of_same_type = cls.objects.all()[1:2][0]
+        while len(MeetingSkip.objects.filter(date=next_meeting_day)) > 0:
+            next_meeting_day += timedelta(days=7)
 
+        last_meeting_of_same_type = cls.objects.all()[1:2][0]
         next_rotation1 = last_meeting_of_same_type.last_rotation.get_after()
         next_rotation2 = next_rotation1.get_after()
 
@@ -117,6 +119,14 @@ class MeetingHistory(models.Model):
             )
 
         return next_meeting
+
+
+class MeetingSkip(models.Model):
+    date   = models.DateField()
+    reason = models.CharField(max_length=255, blank=True)
+
+    class Meta:
+        ordering = ['date']
 
 
 class PresentHistory(models.Model):

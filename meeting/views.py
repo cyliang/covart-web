@@ -42,6 +42,14 @@ class ScheduleView(SingleTableView):
                 t[1] = next_rotation2
 
                 date += timedelta(days=7)
+                while len(models.MeetingSkip.objects.filter(date=date)) > 0:
+                    skip = models.MeetingSkip.objects.get(date=date)
+                    result += [{
+                        'date': date,
+                        'postponed': skip.reason,
+                    }]
+
+                    date += timedelta(days=7)
 
                 for r in (next_rotation1, next_rotation2):
                     result += [{

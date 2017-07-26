@@ -5,18 +5,22 @@ from . import models
 
 class ScheduleTable(tables.Table):
     date = tables.DateColumn(verbose_name='Scheduled Date')
-    present_type = tables.Column(verbose_name='Type')
+    present_type = tables.Column(verbose_name='Type', empty_values=())
     presenter = tables.Column(verbose_name='Presenter')
 
     class Meta:
         orderable = False
         attrs = {'class': 'ts table'}
         row_attrs = {
-            'class': lambda record: 'indicated ' + (
-                'info' if record['present_type'] == models.MeetingHistory.type_choices[0][1]
-                else 'negative'
-            )
+            'class': lambda record: 'disabled' if 'postponed' in record
+                else 'indicated ' + (
+                    'info' if record['present_type'] == models.MeetingHistory.type_choices[0][1]
+                    else 'negative'
+                )
         }
+
+    def render_present_type(self, value, record):
+        return value if value else 'Postponed (%s)' % record['postponed']
 
 
 class HistoryTable(tables.Table):
