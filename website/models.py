@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.utils.text import slugify
+from django.utils.timezone import now
 from time import time
 import requests
 
@@ -29,7 +30,7 @@ class Member(models.Model):
     identity      = models.CharField(max_length=10, choices=identity_choices, default=MS_STUDENT)
     email         = models.EmailField(blank=True)
     picture       = models.ImageField(blank=True, upload_to=member_picture_path)
-    join_date     = models.DateField(auto_now_add=True, editable=True)
+    join_date     = models.DateField(default=now)
     graduate_date = models.DateField(null=True, blank=True)
     thesis        = models.CharField(max_length=255, blank=True)
 
@@ -115,7 +116,7 @@ class InternalLink(models.Model):
     title       = models.CharField(max_length=255)
     help_text   = models.CharField(max_length=255, blank=True)
     link        = models.URLField()
-    update_time = models.DateTimeField(auto_now=True, editable=True)
+    update_time = models.DateTimeField(auto_now=True)
 
     class Meta:
         ordering = ['-update_time']
