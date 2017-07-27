@@ -1,6 +1,8 @@
 from django.views.generic import DetailView
+from django.db.models import ExpressionWrapper, CharField, Value as V, F, Max
+from django.db.models.functions import Concat
 from django_tables2 import SingleTableView
-from datetime import timedelta
+from datetime import timedelta, date
 from . import tables, models
 
 class ScheduleView(SingleTableView):
@@ -76,7 +78,22 @@ class HistoryView(SingleTableView):
     template_name = 'meeting/history.html'
 
     def get_queryset(self):
-        return models.PresentHistory.objects.order_by('meeting')[2:]
+        empty_str = ExpressionWrapper(V(''), output_field=CharField())
+        future_meeting = models.MeetingHistory.objects.latest('date')
+
+        return models.PresentHistory.objects.values(
+            date=F('meeting__date'),
+            present_type=F('meeting__present_type'),
+            presenter_name=F('presenter__name'),
+            present_content=F('content'),
+        ).exclude(meeting__date=future_meeting.date).order_by().union(
+            models.MeetingSkip.objects.all().values(
+                'date',
+                present_type=Concat(V('Postponed: '), 'reason'),
+                presenter_name=empty_str,
+                present_content=empty_str,
+            ).filter(date__lte=date.today()).order_by()
+        ).order_by('-date')
 
 
 class MeetingDetailView(DetailView):

@@ -24,20 +24,29 @@ class ScheduleTable(tables.Table):
 
 
 class HistoryTable(tables.Table):
-    date = tables.DateColumn(accessor='meeting.date')
-    present_type = tables.Column(verbose_name='Type', accessor='meeting.get_present_type_display')
-    presenter = tables.Column()
-    content = tables.Column()
+    date = tables.DateColumn()
+    present_type = tables.Column(verbose_name='Type')
+    presenter = tables.Column(accessor='presenter_name')
+    content = tables.Column(accessor='present_content')
 
     class Meta:
         orderable = False
         attrs = {'class': 'ts selectable fixed single line table'}
         row_attrs = {
-            'class': lambda record: 'clickable indicated ' + (
-                'info' if record.meeting.present_type == models.MeetingHistory.type_choices[0][0]
-                else 'negative'
+            'class': lambda record: 'disabled' if 'Postponed' in record['present_type']
+                else ('clickable indicated ' + (
+                    'info' if record['present_type'] == models.MeetingHistory.type_choices[0][0]
+                    else 'negative'
+                )
             ),
             'onclick': lambda record: "window.location='%s';" % reverse(
-                'meeting:detail', args=[record.meeting.date]
-            ),
+                'meeting:detail', args=[record['date']]
+            ) if 'Postponed' not in record['present_type'] else '',
         }
+
+    type_tr = dict(models.MeetingHistory.type_choices)
+
+    def render_present_type(self, value, record):
+        if 'Postponed' not in value:
+            value = self.type_tr[value]
+        return value
