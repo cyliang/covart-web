@@ -42,7 +42,7 @@ class ScheduleView(SingleTableView):
                 t[1] = next_rotation2
 
                 date += timedelta(days=7)
-                while len(models.MeetingSkip.objects.filter(date=date)) > 0:
+                while models.MeetingSkip.objects.filter(date=date).exists():
                     skip = models.MeetingSkip.objects.get(date=date)
                     result += [{
                         'date': date,

@@ -1,4 +1,4 @@
-Django==1.10.6
+Django==1.11.3
 django-tables2==1.10.0
 django-q==0.8.0
 Pillow==4.0.0

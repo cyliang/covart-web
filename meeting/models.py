@@ -47,7 +47,7 @@ class PresentRotation(models.Model):
         manager = self.__class__.objects
         after   = manager.filter(order__gt=self.order).order_by('order')[:1]
 
-        if len(after) == 1:
+        if after:
             return after[0]
         else:
             return manager.all().order_by('order')[0]
@@ -93,13 +93,13 @@ class MeetingHistory(models.Model):
 
         today          = date.today()
         future_meeting = cls.objects.filter(date__gt=today)[:1]
-        if len(future_meeting) == 1:
+        if future_meeting:
             return future_meeting[0]
 
         next_meeting_day = today + timedelta(
             days=7 + (settings.MEETING_DAY - today.weekday()) % -7
         )
-        while len(MeetingSkip.objects.filter(date=next_meeting_day)) > 0:
+        while MeetingSkip.objects.filter(date=next_meeting_day).exists():
             next_meeting_day += timedelta(days=7)
 
         last_meeting_of_same_type = cls.objects.all()[1:2][0]
