@@ -12,37 +12,84 @@
             <div class="active section">{{ object.title }}</div>
         </div>
 
-        <h2 class="ts dividing header">
-            {{ object.title }}
-            <div class="sub header">{{ object.post_time }}</div>
-        </h2>
-
-        {% if object.picture != "" %}
-        <img class="ts big centered rounded image" src="{{ object.picture.url }}">
-        {% endif %}
-
-        {{ object.content|linebreaks }}
-        <div class="ts divider"></div>
-
+        <div class="ts hidden divider"></div>
         <div class="ts grid">
             {% with previous=object.get_next_by_post_time next=object.get_previous_by_post_time %}
-            {% if previous != "" %}
-            <div class="column">
-            <a class="ts labeled icon left floated tiny basic positive button" href="{% url 'website:activity-detail' previous.slug %}">
-                <i class="angle left icon"></i>
-                {{ previous.title|truncatechars:20 }}
-            </a>
+            <div class="article eleven wide large screen ten wide computer sixteen wide column">
+                <h2 class="ts dividing header">
+                    {{ object.title }}
+                    <div class="sub header">{{ object.post_time }}</div>
+                </h2>
+
+                {% if object.picture != "" %}
+                <img class="ts big centered rounded image" src="{{ object.picture.url }}">
+                {% endif %}
+
+                {{ object.content|linebreaks|urlize }}
+                <div class="ts divider"></div>
+
+                <div class="ts grid">
+                    {% if previous != "" %}
+                    <div class="column">
+                    <a class="ts labeled icon left floated tiny basic positive button" href="{% url 'website:activity-detail' previous.slug %}">
+                        <i class="angle left icon"></i>
+                        {{ previous.title|truncatechars:20 }}
+                    </a>
+                    </div>
+                    {% endif %}
+                    {% if next != "" %}
+                    <div class="right floated column">
+                    <a class="ts right labeled icon right floated tiny basic positive button" href="{% url 'website:activity-detail' next.slug %}">
+                        <i class="angle right icon"></i>
+                        {{ next.title|truncatechars:20 }}
+                    </a>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
-            {% endif %}
-            {% if next != "" %}
-            <div class="right floated column">
-            <a class="ts right labeled icon right floated tiny basic positive button" href="{% url 'website:activity-detail' next.slug %}">
-                <i class="angle right icon"></i>
-                {{ next.title|truncatechars:20 }}
-            </a>
+            <div class="right floated computer or large device only four wide large screen five wide computer column">
+                <div class="ts raised segment">
+                    <div class="ts large header">Latest Activities</div>
+
+                    <div class="ts relaxed selection list">
+                    {% for activity in object_list %}
+                        <a class="{% if activity == object %}selected {% endif %}item" href="{% url 'website:activity-detail' activity.slug %}">
+                            {{ activity.title|truncatechars:35 }}
+                        </a>
+                    {% endfor %}
+                        <a class="info item" href="{% url 'website:activities' %}">
+                            View all activities...
+                        </a>
+                    </div>
+
+                </div>
+
+                <div class="ts grid">
+                    {% if previous != "" %}
+                    <div class="column">
+                    <a href="{% url 'website:activity-detail' previous.slug %}">
+                        <i class="angle left icon"></i>
+                        Prev
+                    </a>
+                    </div>
+                    {% endif %}
+                    {% if next != "" %}
+                    <div class="right floated column">
+                    <a href="{% url 'website:activity-detail' next.slug %}">
+                        Next
+                        <i class="angle right icon"></i>
+                    </a>
+                    </div>
+                    {% endif %}
+                </div>
             </div>
-            {% endif %}
             {% endwith %}
         </div>
     </div>
+
+<style>
+.article > p {
+    font-size: 12pt;
+}
+</style>
 {% endblock %}

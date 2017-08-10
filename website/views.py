@@ -60,6 +60,11 @@ class ActivityDetailView(DetailView):
     model = models.Activity
     template_name = 'website/activity-detail.html'
 
+    def get_context_data(self, **kwargs):
+        context = super(ActivityDetailView, self).get_context_data(**kwargs)
+        context['object_list'] = self.model.objects.all()[:10]
+        return context
+
 
 class LinkListView(ListView):
     model = models.InternalLink
