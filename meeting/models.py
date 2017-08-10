@@ -84,6 +84,20 @@ class MeetingHistory(models.Model):
         return self.date > date.today()
 
     @classmethod
+    def get_next_meeting_date(cls, from_date=None):
+        """
+        This is a utility to calculate the date of the next meeting after
+        `from_date`. The `from_date` defaults to today if not specified.
+        """
+
+        if from_date is None:
+            from_date = date.today()
+
+        return from_date + timedelta(
+            days=7 + (settings.MEETING_DAY - from_date.weekday()) % -7
+        )
+
+    @classmethod
     def rotate_next_meeting(cls):
         """
         Generate the coming meeting on the specified `MEETING_DAY` and add
@@ -96,9 +110,7 @@ class MeetingHistory(models.Model):
         if future_meeting:
             return future_meeting[0]
 
-        next_meeting_day = today + timedelta(
-            days=7 + (settings.MEETING_DAY - today.weekday()) % -7
-        )
+        next_meeting_day = cls.get_next_meeting_date(from_date=today)
         while MeetingSkip.objects.filter(date=next_meeting_day).exists():
             next_meeting_day += timedelta(days=7)
 

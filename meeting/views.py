@@ -43,7 +43,7 @@ class ScheduleView(SingleTableView):
                 next_rotation2 = next_rotation1.get_after()
                 t[1] = next_rotation2
 
-                date += timedelta(days=7)
+                date = models.MeetingHistory.get_next_meeting_date(date)
                 while models.MeetingSkip.objects.filter(date=date).exists():
                     skip = models.MeetingSkip.objects.get(date=date)
                     result += [{
@@ -51,7 +51,7 @@ class ScheduleView(SingleTableView):
                         'postponed': skip.reason,
                     }]
 
-                    date += timedelta(days=7)
+                    date = models.MeetingHistory.get_next_meeting_date(date)
 
                 for r in (next_rotation1, next_rotation2):
                     result += [{

@@ -18,9 +18,7 @@ def send_meeting_notification(base_url, *recipients):
 
     if next_meeting.date - date.today() > timedelta(days=7):
         # The meeting is postponed.
-        postponed_date = date.today() + timedelta(
-            days=7 + (settings.MEETING_DAY - date.today().weekday()) % -7
-        )
+        postponed_date = models.MeetingHistory.get_next_meeting_date()
 
         reason = ''
         skip = list(models.MeetingSkip.objects.filter(date=postponed_date))
