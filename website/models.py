@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 from django.db import models
 from django.utils.text import slugify
 from django.utils.timezone import now
+from django.conf import settings
 from time import time
 import requests
 
@@ -33,6 +34,7 @@ class Member(models.Model):
     join_date     = models.DateField(default=now)
     graduate_date = models.DateField(null=True, blank=True)
     thesis        = models.CharField(max_length=255, blank=True)
+    user          = models.OneToOneField(settings.AUTH_USER_MODEL, null=True, on_delete=models.SET_NULL)
 
     def graduate_year(self):
         return self.graduate_date.year if self.graduate_date else None
