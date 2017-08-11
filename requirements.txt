@@ -3,3 +3,4 @@ django-tables2==1.10.0
 django-q==0.8.0
 Pillow==4.0.0
 requests==2.18.1
+social-auth-app-django==1.2.0
