@@ -135,6 +135,7 @@ SOCIAL_AUTH_PIPELINE = (
 )
 LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
+LOGIN_ERROR_URL = '/login?social_error=1'
 LOGIN_REDIRECT_URL = 'website:index'
 
 # Static files (CSS, JavaScript, Images)

@@ -6,12 +6,63 @@
     <div class="ts container">
         <h2 class="ts dividing header">Login</h2>
 
-        <form method="post">
+        <form class="ts form" method="post" action="{% url 'login' %}">
             {% csrf_token %}
-            {{ form.as_p }}
-            <button type="submit">Login</button>
-        </form>
+            <input type="hidden" name="next" value="{{ next }}">
 
-        <a href="{% url 'social:begin' 'google-oauth2' %}">Login with Google</a>
+            {% if request.GET.social_error == '1' %}
+            <div class="ts negative message">
+                <div class="header">Social Login Failed</div>
+                Your social account is not allowed to login this website. If
+                you think this is not correct, please contact the web master.
+            </div>
+            {% endif %}
+
+            {% if form.errors %}
+            <div class="ts negative message">
+                <div class="header">Username/Password Login Failed</div>
+                <ul class="ts list">
+                {% for err in form.non_field_errors %}
+                    <li>{{ err }}</li>
+                {% endfor %}
+                </ul>
+            </div>
+            {% endif %}
+
+            {% if next %}
+                {% if user.is_authenticated %}
+                <div class="ts warning message">
+                    Your account doesn't have access to this page. To proceed,
+                    please login with an account that has access.
+                </div>
+                {% else %}
+                <div class="ts primary message">
+                    Please login to see this page.
+                </div>
+                {% endif %}
+            {% endif %}
+
+            <div class="ts dividing header">
+                With Username and Password
+            </div>
+            <div class="field">
+                {{ form.username.label_tag }}
+                {{ form.username }}
+            </div>
+            <div class="field">
+                {{ form.password.label_tag }}
+                {{ form.password }}
+                <small>You need to have a valid password set for your account to login with username and password.</small>
+            </div>
+            <button type="submit" class="ts primary button">Login</button>
+
+            <div class="ts dividing header">
+                With Social Network
+            </div>
+            <a class="ts labeled icon positive basic button" href="{% url 'social:begin' 'google-oauth2' %}">
+                <i class="google icon"></i>
+                Login with Google
+            </a>
+        </form>
     </div>
 {% endblock %}
