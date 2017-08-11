@@ -21,8 +21,8 @@ from django.views.generic import TemplateView
 
 urlpatterns = [
     url(r'^meeting/', include('meeting.urls')),
-    url(r'^admin/', admin.site.urls),
+    url(r'^', include('website.urls')),
     url(r'^oauth/', include('social_django.urls', namespace='social')),
     url(r'^', include('django.contrib.auth.urls')),
-    url(r'^', include('website.urls')),
+    url(r'^admin/', admin.site.urls),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
