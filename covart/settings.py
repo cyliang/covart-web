@@ -126,12 +126,19 @@ AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
+# Fix MySQL bugs
+SOCIAL_AUTH_UID_LENGTH = 190
+SOCIAL_AUTH_NONCE_SERVER_URL_LENGTH = 100
+SOCIAL_AUTH_ASSOCIATION_SERVER_URL_LENGTH = 100
+SOCIAL_AUTH_ASSOCIATION_HANDLE_LENGTH = 100
+SOCIAL_AUTH_EMAIL_LENGTH = 190
 SOCIAL_AUTH_PIPELINE = (
     'social_core.pipeline.social_auth.social_details',
     'social_core.pipeline.social_auth.social_uid',
     'social_core.pipeline.social_auth.auth_allowed',
     'social_core.pipeline.social_auth.social_user',
     'social_core.pipeline.social_auth.load_extra_data',
+    'social_core.pipeline.user.user_details',
 )
 LOGIN_URL = 'login'
 LOGOUT_URL = 'logout'
