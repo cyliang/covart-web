@@ -56,19 +56,19 @@
 
         <div class="ts doubling eight cards">
         {% for member in member_list|dictsortreversed:'status' %}
+            <a class="ts
             {% if member.status == member.PRESENT_ON_TIME %}
-            <div class="ts positive raised card">
+            positive
             {% elif member.status == member.LEAVE_BEFORE %}
-            <div class="ts info raised card">
+            info
             {% elif member.status == member.LATE %}
-            <div class="ts raised warning card">
+            warning
             {% elif member.status == member.LEAVE_AFTER %}
-            <div class="ts negative raised card">
+            negative
             {% elif member.status == member.ABSENT %}
-            <div class="ts inverted negative raised card">
-            {% else %}
-            <div class="ts raised card">
+            inverted negative
             {% endif %}
+            raised card" {% if member.reason %}data-tooltip="{{ member.reason }}"{% endif %}>
                 <div class="image">
                     {% if member.member.picture != '' %}
                     <img src="{{ member.member.picture.url }}">
@@ -84,7 +84,7 @@
                         {{ member.get_status_display|capfirst }}
                     </div>
                 </div>
-            </div>
+            </a>
         {% endfor %}
         </div>
         {% endfor %}
