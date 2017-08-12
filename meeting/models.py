@@ -72,6 +72,13 @@ class MeetingHistory(models.Model):
         'website.Member',
         through='PresentHistory',
         through_fields=('meeting', 'presenter'),
+        related_name='presenting',
+    )
+    attendance    = models.ManyToManyField(
+        'website.Member',
+        through='MeetingAttendance',
+        through_fields=('meeting', 'member'),
+        related_name='attending',
     )
 
     class Meta:
@@ -151,3 +158,46 @@ class PresentHistory(models.Model):
 
     def __unicode__(self):
         return "%s: %s" % (unicode(self.meeting), unicode(self.presenter))
+
+
+class ExpectedAttendance(models.Model):
+    """
+    The person who is expected to attend each meeting.
+    """
+
+    member = models.OneToOneField('website.Member', models.CASCADE)
+
+    def __unicode__(self):
+        return unicode(self.member)
+
+
+class MeetingAttendance(models.Model):
+    """
+    The status each member attending each meeting.
+    """
+
+    PRESENT_ON_TIME = 'ONTIME'
+    ON_BUSINESS     = 'BUSINESS'
+    LATE            = 'LATE'
+    LEAVE_BEFORE    = 'LEAVE_BEFORE'
+    LEAVE_AFTER     = 'LEAVE_AFTER'
+    ABSENT          = 'ABSENT'
+    status_choices = (
+        (PRESENT_ON_TIME, 'present on time'),
+        (ON_BUSINESS, 'on business'),
+        (LATE, 'late'),
+        (LEAVE_BEFORE, 'leave in advance'),
+        (LEAVE_AFTER, 'leave afterwards'),
+        (ABSENT, 'absent'),
+    )
+
+    meeting = models.ForeignKey('MeetingHistory', models.CASCADE)
+    member  = models.ForeignKey('website.Member', models.CASCADE)
+    status  = models.CharField(max_length=15, choices=status_choices)
+    reason  = models.TextField(blank=True)
+
+    class Meta:
+        unique_together = ('meeting', 'member')
+
+    def get_is_present(self):
+        return self.status in (self.PRESENT_ON_TIME, self.LATE)
