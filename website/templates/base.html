@@ -40,8 +40,18 @@
             </div>
             <a class="item" href="{% url 'website:activities' %}">Activities</a>
 
-            <div class="ts right item floating dropdown">
-                <div class="text"><i class="{% if user.is_authenticated %}primary {% endif %}user icon"></i></div>
+            <div class="ts right item floating dropdown" style="padding: 0 10px 0 10px;">
+                <div class="text">
+                    {% if user.is_authenticated %}
+                    {% if user.member.picture %}
+                    <img class="ts circular image" src="{{ user.member.picture.url }}" style="margin: 0">
+                    {% else %}
+                    <img class="ts circular image" src="{% static 'website/unknown-person.png' %}" style="margin: 0">
+                    {% endif %}
+                    {% else %}
+                    <i class="user icon" style="margin: auto"></i>
+                    {% endif %}
+                </div>
                 <div class="menu">
                     {% if user.is_authenticated %}
                     <div class="ts top attached card">
