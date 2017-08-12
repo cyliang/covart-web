@@ -115,27 +115,45 @@ class MeetingHistory(models.Model):
         today          = date.today()
         future_meeting = cls.objects.filter(date__gt=today)[:1]
         if future_meeting:
+            # The future meeting is already generated. Return it directly
+            # instead of generating another one.
             return future_meeting[0]
 
+        # Find out the date to hold the new meeting, skipping those dates
+        # scheduled to skip meetings.
         next_meeting_day = cls.get_next_meeting_date(from_date=today)
         while MeetingSkip.objects.filter(date=next_meeting_day).exists():
             next_meeting_day += timedelta(days=7)
 
+        # Find out the type the new meeting shall be and rotate presenters
+        # for this meeting.
         last_meeting_of_same_type = cls.objects.all()[1:2][0]
         next_rotation1 = last_meeting_of_same_type.last_rotation.get_after()
         next_rotation2 = next_rotation1.get_after()
 
+        # Create the meeting.
         next_meeting = cls.objects.create(
             date          = next_meeting_day,
             present_type  = last_meeting_of_same_type.present_type,
             last_rotation = next_rotation2,
         )
 
+        # Create presenters for the meeting.
         for presenter in (next_rotation1, next_rotation2):
             PresentHistory.objects.create(
                 presenter = presenter.presenter,
                 meeting   = next_meeting,
             )
+
+        # Create default attendance status for the meeting.
+        MeetingAttendance.objects.bulk_create([
+            MeetingAttendance(
+                meeting=next_meeting,
+                member=expected.member,
+                status=MeetingAttendance.PRESENT_ON_TIME,
+            )
+            for expected in ExpectedAttendance.objects.all()
+        ])
 
         return next_meeting
 

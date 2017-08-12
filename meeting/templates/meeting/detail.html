@@ -1,4 +1,5 @@
 {% extends 'meeting/base.html' %}
+{% load static %}
 
 {% block content %}
     {{ block.super }}
@@ -36,6 +37,56 @@
             <div class="ts bottom attached segment">
                 {{ presentation.content|default:"The presenter did not provide his content."|linebreaks }}
             </div>
+        {% endfor %}
+
+        <h4>Attendance Status</h4>
+        {% regroup object.meetingattendance_set.all|dictsortreversed:'get_is_present' by get_is_present as attendance %}
+
+        <h5>Attendees</h5>
+        {% if not attendance.0.grouper %}
+        <div class="ts negative message">
+            There isn't any attendee in the record.
+        </div>
+        {% endif %}
+
+        {% for grouper, member_list in attendance %}
+        {% if not grouper %}
+        <h5>Absentees</h5>
+        {% endif %}
+
+        <div class="ts doubling eight cards">
+        {% for member in member_list|dictsortreversed:'status' %}
+            {% if member.status == member.PRESENT_ON_TIME %}
+            <div class="ts positive raised card">
+            {% elif member.status == member.LEAVE_BEFORE %}
+            <div class="ts info raised card">
+            {% elif member.status == member.LATE %}
+            <div class="ts raised warning card">
+            {% elif member.status == member.LEAVE_AFTER %}
+            <div class="ts negative raised card">
+            {% elif member.status == member.ABSENT %}
+            <div class="ts inverted negative raised card">
+            {% else %}
+            <div class="ts raised card">
+            {% endif %}
+                <div class="image">
+                    {% if member.member.picture != '' %}
+                    <img src="{{ member.member.picture.url }}">
+                    {% else %}
+                    <img src="{% static 'website/unknown-person.png' %}">
+                    {% endif %}
+                </div>
+                <div class="content">
+                    <div class="header">
+                        {{ member.member.name }}
+                    </div>
+                    <div class="meta">
+                        {{ member.get_status_display|capfirst }}
+                    </div>
+                </div>
+            </div>
+        {% endfor %}
+        </div>
         {% endfor %}
     </div>
 {% endblock %}
