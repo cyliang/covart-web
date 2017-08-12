@@ -6,6 +6,7 @@ urlpatterns = [
     url(r'^schedule$', views.ScheduleView.as_view(), name='schedule'),
     url(r'^history$', views.HistoryView.as_view(), name='history'),
     url(r'^history/(?P<slug>\d{4}-\d{2}-\d{2})$', views.MeetingDetailView.as_view(), name='detail'),
+    url(r'^history/(?P<pk>\d+)/update$', views.PresentUpdateView.as_view(), name='content-update'),
     url(r'^$', RedirectView.as_view(pattern_name='meeting:schedule')),
 ]
 

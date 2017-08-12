@@ -1,9 +1,10 @@
-from django.views.generic import DetailView
+from django.views.generic import DetailView, UpdateView
+from django.urls import reverse
 from django.db.models import ExpressionWrapper, CharField, Value as V, F, Max
 from django.db.models.functions import Concat
 from django_tables2 import SingleTableView
 from datetime import timedelta, date
-from . import tables, models
+from . import tables, models, forms
 
 class ScheduleView(SingleTableView):
     """
@@ -101,3 +102,11 @@ class MeetingDetailView(DetailView):
     template_name = 'meeting/detail.html'
     slug_field = 'date'
 
+
+class PresentUpdateView(UpdateView):
+    model = models.PresentHistory
+    form_class = forms.PresentUpdateForm
+    template_name = 'meeting/content_update.html'
+
+    def get_success_url(self):
+        return reverse('meeting:detail', args=[self.object.meeting.date])

@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Presentation Detail Update{% endblock %}
+
+{% block content %}
+    <div class="ts container">
+        <h2 class="ts dividing header">
+            Update Your Presentation Content
+        </h2>
+
+        <div class="ts raised segment">
+            <div class="ts grid">
+                <div class="stretched column">
+                    <div class="ts dividing header">
+                        Meeting Information
+                    </div>
+                    <ul class="ts list">
+                        <li>Date: {{ object.meeting.date }}</li>
+                        <li>Type: {{ object.meeting.get_present_type_display }}</li>
+                    </ul>
+                </div>
+                <div class="right floated column">
+                    <div class="ts rounded large calendar">
+                        <div class="header">{{ object.meeting.date|date:"M" }}</div>
+                        <div class="content">
+                            <div class="date">{{ object.meeting.date|date:"d" }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ts dividing header">
+            Presentation Content
+        </div>
+        <form class="ts form" method="post" action="">
+            {% csrf_token %}
+            <div class="field">
+                <label>Presenter</label>
+                {% if presenter.picture != '' %}
+                <img class="ts avatar image" src="{{ object.presenter.picture.url }}">
+                {% else %}
+                <img class="ts avatar image" src="{% static 'website/unknown-person.png' %}">
+                {% endif %}
+                <span>{{ object.presenter }}</span>
+            </div>
+            <div class="field">
+                <label for="{{ form.content.id_for_label }}">Content</label>
+                {{ form.content }}
+            </div>
+            <div class="field">
+                <div class="ts disabled checkbox">
+                    {{ form.email_notification }}
+                    <label for="{{ form.email_notification.id_for_label }}">
+                        Send a notification email to everyone.
+                    </label>
+                </div>
+            </div>
+
+            <button type="submit" class="ts positive button">Update</button>
+        </form>
+    </div>
+{% endblock %}
