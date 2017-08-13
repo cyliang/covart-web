@@ -9,27 +9,7 @@
             Update Your Presentation Content
         </h2>
 
-        <div class="ts raised segment">
-            <div class="ts grid">
-                <div class="stretched column">
-                    <div class="ts dividing header">
-                        Meeting Information
-                    </div>
-                    <ul class="ts list">
-                        <li>Date: {{ object.meeting.date }}</li>
-                        <li>Type: {{ object.meeting.get_present_type_display }}</li>
-                    </ul>
-                </div>
-                <div class="right floated column">
-                    <div class="ts rounded large calendar">
-                        <div class="header">{{ object.meeting.date|date:"M" }}</div>
-                        <div class="content">
-                            <div class="date">{{ object.meeting.date|date:"d" }}</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
+        {% include 'meeting/brief-info.html' with meeting=object.meeting %}
 
         <div class="ts dividing header">
             Presentation Content

@@ -40,6 +40,12 @@
         {% endfor %}
 
         <h4>Attendance Status</h4>
+        {% if user.is_authenticated %}
+        <a class="ts tiny primary button" href="{% url 'meeting:attendance-update' object.date %}">
+            Update attendance status
+        </a>
+        {% endif %}
+
         {% regroup object.meetingattendance_set.all|dictsortreversed:'get_is_present' by get_is_present as attendance %}
 
         <h5>Attendees</h5>

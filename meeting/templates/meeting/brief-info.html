@@ -1,0 +1,21 @@
+<div class="ts raised segment">
+    <div class="ts grid">
+        <div class="stretched column">
+            <div class="ts dividing header">
+                Meeting Information
+            </div>
+            <ul class="ts list">
+                <li>Date: {{ meeting.date }}</li>
+                <li>Type: {{ meeting.get_present_type_display }}</li>
+            </ul>
+        </div>
+        <div class="right floated column">
+            <div class="ts rounded large calendar">
+                <div class="header">{{ meeting.date|date:"M" }}</div>
+                <div class="content">
+                    <div class="date">{{ meeting.date|date:"d" }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

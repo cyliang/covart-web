@@ -1,7 +1,10 @@
+from django.shortcuts import redirect
 from django.views.generic import DetailView, UpdateView
 from django.urls import reverse
 from django.db.models import ExpressionWrapper, CharField, Value as V, F, Max
 from django.db.models.functions import Concat
+from django.forms import widgets, modelformset_factory
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django_tables2 import SingleTableView
 from datetime import timedelta, date
 from . import tables, models, forms
@@ -101,6 +104,56 @@ class MeetingDetailView(DetailView):
     model = models.MeetingHistory
     template_name = 'meeting/detail.html'
     slug_field = 'date'
+
+
+class AttendanceEditView(LoginRequiredMixin, MeetingDetailView):
+    AttendanceFormSet = modelformset_factory(
+        models.MeetingAttendance,
+        fields=('meeting', 'member', 'status', 'reason'),
+        widgets={
+            'meeting': widgets.HiddenInput(),
+            'reason': widgets.Textarea(attrs={'rows': 1}),
+        },
+        can_delete=True,
+    )
+    template_name = 'meeting/attendance_update.html'
+
+    def get_formset(self):
+        kwargs = {}
+        if self.request.method == 'POST':
+            kwargs = {
+                'data': self.request.POST,
+                'files': self.request.FILES,
+            }
+
+        return self.AttendanceFormSet(
+            queryset=self.object.meetingattendance_set.all(),
+            initial=[{
+                'meeting': self.object,
+            }],
+            **kwargs
+        )
+
+    def formset_valid(self, formset):
+        formset.save()
+        return redirect(self.request.path)
+
+    def formset_invalid(self, formset):
+        return self.render_to_response(self.get_context_data())
+
+    def get_context_data(self, **kwargs):
+        context = super(MeetingDetailView, self).get_context_data(**kwargs)
+        context['formset'] = self.get_formset()
+        return context
+
+    def post(self, request, *args, **kwargs):
+        self.object = self.get_object()
+        formset = self.get_formset()
+
+        if formset.is_valid():
+            return self.formset_valid(formset)
+        else:
+            return self.formset_invalid(formset)
 
 
 class PresentUpdateView(UpdateView):

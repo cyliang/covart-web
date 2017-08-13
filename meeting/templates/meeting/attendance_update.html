@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+
+{% block title %}Attendance Update for {{ object }}{% endblock %}
+
+{% block content %}
+    <div class="ts container">
+        <h2 class="ts dividing header">
+            Attendance Status Update
+        </h2>
+
+        {% include 'meeting/brief-info.html' with meeting=object %}
+
+        <form class="ts small form" method="post" action="">
+        {% csrf_token %}
+        {{ formset.management_form }}
+
+        {% for form in formset.forms %}
+            <fieldset>
+            <div class="fields">
+                {% for hidden in form.hidden_fields %}
+                {{ hidden }}
+                {% endfor %}
+
+                <div class="field">
+                    {{ form.member.label_tag }}
+                    {{ form.member }}
+                </div>
+                <div class="field">
+                    {{ form.status.label_tag }}
+                    {{ form.status }}
+                </div>
+                <div class="field">
+                    {{ form.reason.label_tag }}
+                    {{ form.reason }}
+                </div>
+            </div>
+            <div class="field">
+                <div class="ts toggle checkbox">
+                    {{ form.DELETE }}
+                    <label for="{{ form.DELETE.id_for_label }}">
+                        Delete this record
+                    </label>
+                </div>
+            </div>
+            </fieldset>
+        {% endfor %}
+        <button type="submit" class="ts warning button">Update</button>
+        </form>
+    </div>
+{% endblock %}
