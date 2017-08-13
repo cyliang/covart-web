@@ -59,7 +59,7 @@
             <div class="ts dividing header">
                 With Social Network
             </div>
-            <a class="ts labeled icon positive basic button" href="{% url 'social:begin' 'google-oauth2' %}">
+            <a class="ts labeled icon positive basic button" href="{% url 'social:begin' 'google-oauth2' %}?{{ request.GET.urlencode }}">
                 <i class="google icon"></i>
                 Login with Google
             </a>
