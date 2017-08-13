@@ -94,6 +94,20 @@ class MeetingHistory(models.Model):
     def not_yet_happened(self):
         return self.date > date.today()
 
+    def get_attendance_statistics(self):
+        attendance = self.meetingattendance_set
+        expected = attendance.all().count()
+        on_time = attendance.filter(status=MeetingAttendance.PRESENT_ON_TIME).count()
+        late = attendance.filter(status=MeetingAttendance.LATE).count()
+
+        return {
+            'expected': expected,
+            'PRESENT_ON_TIME': on_time,
+            'LATE': late,
+            'not_present': expected - on_time - late,
+            'present_rate': (on_time + late) * 100 / expected if expected != 0 else 100,
+        }
+
     @classmethod
     def get_next_meeting_date(cls, from_date=None):
         """
