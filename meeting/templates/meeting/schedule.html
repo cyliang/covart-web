@@ -11,7 +11,7 @@
         {% include 'meeting/cards-calendar.html' with meeting=upcoming %}
         <div class="ts grid">
             <div class="right floated column">
-                <a class="ts primary button" href="{% url 'meeting:detail' upcoming.date %}">
+                <a class="ts primary button" href="{{ upcoming.get_absolute_url }}">
                     Detail<i class="angle double right icon"></i>
                 </a>
             </div>

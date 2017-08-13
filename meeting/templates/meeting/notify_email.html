@@ -3,7 +3,7 @@ The next group meeting for <strong>{{ meeting.get_present_type_display|lower }}<
 </p>
 <p>
 Click the following link for further detail:<br>
-<a href="{{ base_url }}{% url 'meeting:detail' meeting.date %}">
-    {{ base_url }}{% url 'meeting:detail' meeting.date %}
+<a href="{{ base_url }}{{ meeting.get_absolute_url }}">
+    {{ base_url }}{{ meeting.get_absolute_url }}
 </a>
 

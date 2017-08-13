@@ -14,7 +14,7 @@
             {% endif %}
             </a>
             <div class="divider"> / </div>
-            <a class="section" href="{% url 'meeting:detail' object.date %}">
+            <a class="section" href="{{ object.get_absolute_url }}">
                 {{ object.date }}: {{ object.get_present_type_display }}
             </a>
             <div class="divider"> / </div>
@@ -63,6 +63,7 @@
             </fieldset>
         {% endfor %}
         <button type="submit" class="ts warning button">Update</button>
+        <a class="ts button" href="{{ object.get_absolute_url }}">Cancel</a>
         </form>
     </div>
 {% endblock %}

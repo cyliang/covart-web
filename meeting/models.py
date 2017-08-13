@@ -2,6 +2,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.conf import settings
+from django.urls import reverse
 from datetime import date, timedelta
 
 class PresentRotation(models.Model):
@@ -86,6 +87,9 @@ class MeetingHistory(models.Model):
 
     def __unicode__(self):
         return "%s %s" % (unicode(self.date), self.get_present_type_display())
+
+    def get_absolute_url(self):
+        return reverse('meeting:detail', args=[self.date])
 
     def not_yet_happened(self):
         return self.date > date.today()

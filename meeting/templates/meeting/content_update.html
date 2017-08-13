@@ -15,7 +15,7 @@
             {% endif %}
             </a>
             <div class="divider"> / </div>
-            <a class="section" href="{% url 'meeting:detail' object.meeting.date %}">
+            <a class="section" href="{{ object.meeting.get_absolute_url }}">
                 {{ object.meeting.date }}: {{ object.meeting.get_present_type_display }}
             </a>
             <div class="divider"> / </div>
@@ -57,6 +57,9 @@
             </div>
 
             <button type="submit" class="ts positive button">Update</button>
+            <a class="ts button" href="{{ object.meeting.get_absolute_url }}">
+                Cancel
+            </a>
         </form>
     </div>
 {% endblock %}

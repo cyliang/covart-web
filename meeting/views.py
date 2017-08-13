@@ -162,4 +162,4 @@ class PresentUpdateView(UpdateView):
     template_name = 'meeting/content_update.html'
 
     def get_success_url(self):
-        return reverse('meeting:detail', args=[self.object.meeting.date])
+        return self.object.meeting.get_absolute_url()

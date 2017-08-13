@@ -31,7 +31,7 @@
                 <div class="ts grid">
                     {% if previous != "" %}
                     <div class="column">
-                    <a class="ts labeled icon left floated tiny basic positive button" href="{% url 'website:activity-detail' previous.slug %}">
+                    <a class="ts labeled icon left floated tiny basic positive button" href="{{ previous.get_absolute_url }}">
                         <i class="angle left icon"></i>
                         {{ previous.title|truncatechars:20 }}
                     </a>
@@ -39,7 +39,7 @@
                     {% endif %}
                     {% if next != "" %}
                     <div class="right floated column">
-                    <a class="ts right labeled icon right floated tiny basic positive button" href="{% url 'website:activity-detail' next.slug %}">
+                    <a class="ts right labeled icon right floated tiny basic positive button" href="{{ next.get_absolute_url }}">
                         <i class="angle right icon"></i>
                         {{ next.title|truncatechars:20 }}
                     </a>
@@ -53,7 +53,7 @@
 
                     <div class="ts relaxed selection list">
                     {% for activity in object_list %}
-                        <a class="{% if activity == object %}selected {% endif %}item" href="{% url 'website:activity-detail' activity.slug %}">
+                        <a class="{% if activity == object %}selected {% endif %}item" href="{{ activity.get_absolute_url }}">
                             {{ activity.title|truncatechars:35 }}
                         </a>
                     {% endfor %}
@@ -67,7 +67,7 @@
                 <div class="ts grid">
                     {% if previous != "" %}
                     <div class="column">
-                    <a href="{% url 'website:activity-detail' previous.slug %}">
+                    <a href="{{ previous.get_absolute_url }}">
                         <i class="angle left icon"></i>
                         Prev
                     </a>
@@ -75,7 +75,7 @@
                     {% endif %}
                     {% if next != "" %}
                     <div class="right floated column">
-                    <a href="{% url 'website:activity-detail' next.slug %}">
+                    <a href="{{ next.get_absolute_url }}">
                         Next
                         <i class="angle right icon"></i>
                     </a>

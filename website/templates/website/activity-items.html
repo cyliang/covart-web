@@ -1,5 +1,5 @@
 {% for activity in activities %}
-    <a class="ts raised card" href="{% url 'website:activity-detail' activity.slug %}">
+    <a class="ts raised card" href="{{ activity.get_absolute_url }}">
         {% if activity.picture != "" %}
         <div class="image">
             <img src="{{ activity.picture.url }}">
