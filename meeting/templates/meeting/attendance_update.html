@@ -4,6 +4,24 @@
 
 {% block content %}
     <div class="ts container">
+        <div class="ts breadcrumb">
+            {% if object.not_yet_happened %}
+            <a class="section" href="{% url 'meeting:schedule' %}">
+                Meeting schedule
+            {% else %}
+            <a class="section" href="{% url 'meeting:history' %}">
+                Meeting history
+            {% endif %}
+            </a>
+            <div class="divider"> / </div>
+            <a class="section" href="{% url 'meeting:detail' object.date %}">
+                {{ object.date }}: {{ object.get_present_type_display }}
+            </a>
+            <div class="divider"> / </div>
+            <div class="active section">
+                Attendance Status
+            </div>
+        </div>
         <h2 class="ts dividing header">
             Attendance Status Update
         </h2>

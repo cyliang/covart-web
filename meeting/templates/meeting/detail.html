@@ -1,9 +1,9 @@
-{% extends 'meeting/base.html' %}
+{% extends 'base.html' %}
 {% load static %}
 
-{% block content %}
-    {{ block.super }}
+{% block title %}Meeting Detail{% endblock %}
 
+{% block content %}
     <div class="ts container">
         <div class="ts breadcrumb">
             {% if object.not_yet_happened %}
@@ -17,6 +17,7 @@
             <div class="divider"> / </div>
             <div class="active section">{{ object.date }}: {{ object.get_present_type_display }}</div>
         </div>
+        <h2 class="ts dividing header">Meeting Detail</h2>
 
         <h4>Presenters</h4>
         {% include 'meeting/cards-calendar.html' with meeting=object %}

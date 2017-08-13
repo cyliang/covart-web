@@ -1,10 +1,11 @@
-{% extends 'meeting/base.html' %}
+{% extends 'base.html' %}
 {% load render_table from django_tables2 %}
 
-{% block content %}
-    {{ block.super }}
+{% block title %}Meeting History{% endblock %}
 
+{% block content %}
     <div class="ts container">
+        <h2 class="ts dividing header">Meeting History</h2>
         {% render_table table %}
     </div>
 

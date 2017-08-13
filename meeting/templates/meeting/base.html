@@ -1,9 +1,0 @@
-{% extends "base.html" %}
-
-{% block title %}Meeting {{ request.resolver_match.url_name|title }}{% endblock %}
-
-{% block content %}
-    <div class="ts container">
-        <h2 class="ts dividing header">Meeting {{ request.resolver_match.url_name|title }}</h2>
-    </div>
-{% endblock %}
