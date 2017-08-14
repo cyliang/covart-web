@@ -10,10 +10,9 @@
         </div>
     </div>
 </div>
-<div class="ts two column stackable centered grid">
-    <div class="column">
-    <div class="ts two cards">
+<div class="ts centered relaxed grid">
     {% for presentation in meeting.presenthistory_set.all %}
+    <div class="four wide computer eight wide mobile column">
         {% with presenter=presentation.presenter %}
         {% if presentation.present_type == presentation.PAPER_PRESENTATION %}
         <div class="ts raised info card">
@@ -36,7 +35,6 @@
             </div>
         </div>
         {% endwith %}
+    </div>
     {% endfor %}
-    </div>
-    </div>
 </div>

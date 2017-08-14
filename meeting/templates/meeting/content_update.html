@@ -32,23 +32,28 @@
         <div class="ts dividing header">
             Presentation Content
         </div>
+        <div class="ts header">Presenter</div>
+        <div class="ts items">
+            <div class="item">
+                <div class="ts tiny image">
+                    {% if presenter.picture != '' %}
+                    <img src="{{ object.presenter.picture.url }}">
+                    {% else %}
+                    <img src="{% static 'website/unknown-person.png' %}">
+                    {% endif %}
+                </div>
+                <div class="middle aligned content">
+                    <div class="header">{{ object.presenter }}</div>
+                    <div class="meta">{{ object.get_present_type_display|title }}</div>
+                </div>
+            </div>
+        </div>
         <form class="ts form" method="post" action="">
             {% csrf_token %}
             <div class="field">
-                <label>Presenter</label>
-                {% if presenter.picture != '' %}
-                <img class="ts avatar image" src="{{ object.presenter.picture.url }}">
-                {% else %}
-                <img class="ts avatar image" src="{% static 'website/unknown-person.png' %}">
-                {% endif %}
-                <span>{{ object.presenter }}</span>
-            </div>
-            <div class="field">
-                <label>Presentation Type</label>
-                {{ object.get_present_type_display|title }}
-            </div>
-            <div class="field">
-                <label for="{{ form.content.id_for_label }}">Content</label>
+                <label for="{{ form.content.id_for_label }}">
+                    <div class="ts header">Content</div>
+                </label>
                 {{ form.content }}
             </div>
             <div class="field">
