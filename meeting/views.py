@@ -38,30 +38,42 @@ class ScheduleView(SingleTableView):
         # Get other future meetings.
         date = next_meeting.date
         last_rotation = next_meeting.last_rotation
-        for t in ('another_type', 'present_type'):
-            for i in range(models.PresentRotation.objects.all().count()):
-                next_rotation1 = last_rotation.get_after()
-                last_rotation = next_rotation1.get_after()
+        counter = 0
+        num_rotation = models.PresentRotation.objects.all().count()
+        for i in range(num_rotation):
+            next_rotation1 = last_rotation.get_after()
+            last_rotation = next_rotation1.get_after()
+
+            date = models.MeetingHistory.get_next_meeting_date(date)
+            while models.MeetingSkip.objects.filter(date=date).exists():
+                skip = models.MeetingSkip.objects.get(date=date)
+                result += [{
+                    'date': date,
+                    'postponed': skip.reason,
+                }]
 
                 date = models.MeetingHistory.get_next_meeting_date(date)
-                while models.MeetingSkip.objects.filter(date=date).exists():
-                    skip = models.MeetingSkip.objects.get(date=date)
-                    result += [{
-                        'date': date,
-                        'postponed': skip.reason,
-                    }]
 
-                    date = models.MeetingHistory.get_next_meeting_date(date)
+            for r in (next_rotation1, last_rotation):
+                past = r.presenter.presenthistory_set.filter(is_specially_arranged=False)
+                if past.count() > 0:
+                    present_type = getattr(
+                        past[0],
+                        'another_type' if counter < num_rotation else 'present_type'
+                    )
+                elif counter < num_rotation:
+                    present_type = models.PresentHistory.DEFAULT_TYPE
+                else:
+                    present_type = models.PresentHistory(
+                        present_type=models.PresentHistory.DEFAULT_TYPE
+                    ).another_type
 
-                for r in (next_rotation1, last_rotation):
-                    result += [{
-                        'date': date,
-                        'presenter': r.presenter,
-                        'present_type': getattr(
-                            r.presenter.presenthistory_set.filter(is_specially_arranged=False)[0],
-                            t
-                        ),
-                    }]
+                result += [{
+                    'date': date,
+                    'presenter': r.presenter,
+                    'present_type': present_type,
+                }]
+                counter += 1
 
         return result
 

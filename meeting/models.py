@@ -149,10 +149,11 @@ class MeetingHistory(models.Model):
         # Create presenters for the meeting.
         for presenter in (next_rotation1, next_rotation2):
             manager = presenter.presenter.presenthistory_set
+            past = manager.filter(is_specially_arranged=False)
 
             manager.create(
                 meeting=next_meeting,
-                present_type=manager.filter(is_specially_arranged=False)[0].another_type,
+                present_type=past[0].another_type if past.count() > 0 else PresentHistory.DEFAULT_TYPE,
             )
 
         # Create default attendance status for the meeting.
@@ -185,6 +186,7 @@ class PresentHistory(models.Model):
         (PROGRESS_REPORT,    "Progress report"),
         (OTHER,              "Other"),
     )
+    DEFAULT_TYPE = PROGRESS_REPORT
 
     presenter    = models.ForeignKey('website.Member', models.SET_NULL, null=True)
     meeting      = models.ForeignKey('MeetingHistory', models.SET_NULL, null=True)
