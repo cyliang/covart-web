@@ -1,0 +1,9 @@
+<p>
+Please help check the attendance status of the meeting held on {{ meeting.date }}. Thanks!
+</p>
+<p>
+Update the attendance status here:<br>
+<a href="{{ base_url }}{% url 'meeting:attendance-update' meeting.date %}">
+    {{ base_url }}{% url 'meeting:attendance-update' meeting.date %}
+</a>
+</p>

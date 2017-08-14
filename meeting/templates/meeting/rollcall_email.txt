@@ -1,0 +1,2 @@
+Please help check the attendance status of the meeting held on {{ meeting.date }}. Thanks!
+Update the attendance status here: {{ base_url }}{% url 'meeting:attendance-update' meeting.date %}

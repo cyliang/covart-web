@@ -7,6 +7,43 @@ from datetime import timedelta, date
 def weekly_update():
     models.MeetingHistory.rotate_next_meeting()
 
+def send_rollcall_notification(base_url):
+    """
+    This task send a rollcall notification to each presenter.
+    """
+
+    try:
+        meeting = models.MeetingHistory.objects.get(date=date.today())
+    except models.MeetingHistory.DoesNotExist:
+        return 'There is no meeting today. Aborted.'
+
+    data = {
+        'meeting': meeting,
+        'base_url': base_url,
+    }
+
+    text_body = render_to_string('meeting/rollcall_email.txt', data)
+    html_body = render_to_string('meeting/rollcall_email.html', data)
+
+    def get_email(member):
+        if not member.user:
+            return None
+
+        email = member.user.email
+        social = member.user.social_auth.filter(provider='google-auth2')
+        if not email and social.exists():
+            email = social[0].uid
+
+        return email
+
+    mail = EmailMultiAlternatives(
+        subject=meeting.date.strftime('Rollcall Notification (%m/%d)'),
+        body=text_body,
+        to=filter(lambda e: e != None, map(get_email, meeting.presenters.all())),
+    )
+    mail.attach_alternative(html_body, 'text/html')
+    mail.send()
+
 def send_meeting_notification(base_url, *recipients):
     next_meeting = models.MeetingHistory.objects.all()[:1][0]
 
