@@ -16,7 +16,7 @@
             </a>
             <div class="divider"> / </div>
             <a class="section" href="{{ object.meeting.get_absolute_url }}">
-                {{ object.meeting.date }}: {{ object.meeting.get_present_type_display }}
+                {{ object.meeting }}
             </a>
             <div class="divider"> / </div>
             <div class="active section">
@@ -42,6 +42,10 @@
                 <img class="ts avatar image" src="{% static 'website/unknown-person.png' %}">
                 {% endif %}
                 <span>{{ object.presenter }}</span>
+            </div>
+            <div class="field">
+                <label>Presentation Type</label>
+                {{ object.get_present_type_display|title }}
             </div>
             <div class="field">
                 <label for="{{ form.content.id_for_label }}">Content</label>

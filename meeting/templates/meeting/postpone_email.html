@@ -1,5 +1,12 @@
 <p>
-There will be <strong>no</strong> group meeting next week ({{ postponed_date }}){{ reason|lower }}. The next group meeting for <strong>{{ meeting.get_present_type_display|lower }}</strong> has been postponed to {{ meeting.date }}. Presenters will be {{ presenters|join:' and ' }}.
+There will be <strong>no</strong> group meeting next week ({{ postponed_date }}){{ reason|lower }}.
+The next group meeting has been postponed to {{ meeting.date }}.
+Presenters will be:
+<ul>
+{% for presentation in meeting.presenthistory_set.all %}
+    <li>{{ presentation.presenter }}: {{ presentation.get_present_type_display }}</li>
+{% endfor %}
+</ul>
 </p>
 <p>
 Click the following link for further detail:<br>

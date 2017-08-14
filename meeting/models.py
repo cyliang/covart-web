@@ -59,15 +59,7 @@ class MeetingHistory(models.Model):
     The history for past meetings and one coming meeting.
     """
 
-    PAPER_PRESENTATION = "PAPER"
-    PROGRESS_REPORT    = "PROGRESS"
-    type_choices = (
-        (PAPER_PRESENTATION, "Paper presentation"),
-        (PROGRESS_REPORT,    "Progress report"),
-    )
-
     date          = models.DateField(unique=True)
-    present_type  = models.CharField(max_length=10, choices=type_choices)
     last_rotation = models.ForeignKey('PresentRotation', models.SET_NULL, null=True)
     presenters    = models.ManyToManyField(
         'website.Member',
@@ -86,7 +78,7 @@ class MeetingHistory(models.Model):
         ordering = ['-date']
 
     def __unicode__(self):
-        return "%s %s" % (unicode(self.date), self.get_present_type_display())
+        return "%s Group Meeting" % unicode(self.date)
 
     def get_absolute_url(self):
         return reverse('meeting:detail', args=[self.date])
@@ -143,24 +135,24 @@ class MeetingHistory(models.Model):
         while MeetingSkip.objects.filter(date=next_meeting_day).exists():
             next_meeting_day += timedelta(days=7)
 
-        # Find out the type the new meeting shall be and rotate presenters
-        # for this meeting.
-        last_meeting_of_same_type = cls.objects.all()[1:2][0]
-        next_rotation1 = last_meeting_of_same_type.last_rotation.get_after()
+        # Look up previous meeting and rotate presenters for this meeting.
+        last_meeting = cls.objects.all()[0]
+        next_rotation1 = last_meeting.last_rotation.get_after()
         next_rotation2 = next_rotation1.get_after()
 
         # Create the meeting.
         next_meeting = cls.objects.create(
             date          = next_meeting_day,
-            present_type  = last_meeting_of_same_type.present_type,
             last_rotation = next_rotation2,
         )
 
         # Create presenters for the meeting.
         for presenter in (next_rotation1, next_rotation2):
-            PresentHistory.objects.create(
-                presenter = presenter.presenter,
-                meeting   = next_meeting,
+            manager = presenter.presenter.presenthistory_set
+
+            manager.create(
+                meeting=next_meeting,
+                present_type=manager.filter(is_specially_arranged=False)[0].another_type,
             )
 
         # Create default attendance status for the meeting.
@@ -185,15 +177,42 @@ class MeetingSkip(models.Model):
 
 
 class PresentHistory(models.Model):
-    presenter = models.ForeignKey('website.Member', models.SET_NULL, null=True)
-    meeting   = models.ForeignKey('MeetingHistory', models.SET_NULL, null=True)
-    content   = models.TextField(blank=True)
+    PAPER_PRESENTATION = "PAPER"
+    PROGRESS_REPORT    = "PROGRESS"
+    OTHER              = "OTHER"
+    type_choices = (
+        (PAPER_PRESENTATION, "Paper presentation"),
+        (PROGRESS_REPORT,    "Progress report"),
+        (OTHER,              "Other"),
+    )
+
+    presenter    = models.ForeignKey('website.Member', models.SET_NULL, null=True)
+    meeting      = models.ForeignKey('MeetingHistory', models.SET_NULL, null=True)
+    present_type = models.CharField(max_length=10, choices=type_choices)
+    content      = models.TextField(blank=True)
+    is_specially_arranged = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['meeting']
 
     def __unicode__(self):
-        return "%s: %s" % (unicode(self.meeting), unicode(self.presenter))
+        meeting = unicode(self.meeting.date) if self.meeting else 'Unknown Meeting'
+        presenter = unicode(self.presenter) if self.presenter else 'Unknown Presenter'
+
+        return "%s (%s): %s" % (
+            presenter,
+            meeting,
+            self.get_present_type_display()
+        )
+
+    @property
+    def another_type(self):
+        if self.present_type == self.PAPER_PRESENTATION:
+            return self.PROGRESS_REPORT
+        elif self.present_type == self.PROGRESS_REPORT:
+            return self.PAPER_PRESENTATION
+        else:
+            raise ValueError('Can only exchange "progress report" and "paper presentation".')
 
 
 class ExpectedAttendance(models.Model):

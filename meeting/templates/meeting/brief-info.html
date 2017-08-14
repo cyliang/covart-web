@@ -6,7 +6,7 @@
             </div>
             <ul class="ts list">
                 <li>Date: {{ meeting.date }}</li>
-                <li>Type: {{ meeting.get_present_type_display }}</li>
+                <li>Presenters: {{ meeting.presenters.all|join:' and ' }}</li>
             </ul>
         </div>
         <div class="right floated column">

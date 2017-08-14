@@ -1,5 +1,11 @@
 <p>
-The next group meeting for <strong>{{ meeting.get_present_type_display|lower }}</strong> will be held on {{ meeting.date }}. Presenters will be {{ presenters|join:' and ' }}.
+The next group meeting will be held on {{ meeting.date }}.
+Presenters will be:
+<ul>
+{% for presentation in meeting.presenthistory_set.all %}
+    <li>{{ presentation.presenter }}: {{ presentation.get_present_type_display }}</li>
+{% endfor %}
+</ul>
 </p>
 <p>
 Click the following link for further detail:<br>

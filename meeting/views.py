@@ -29,23 +29,19 @@ class ScheduleView(SingleTableView):
         result = [
             {
                 'date': next_meeting.date,
-                'present_type': next_meeting.get_present_type_display(),
-                'presenter': presenter
+                'present_type': presentation.present_type,
+                'presenter': presentation.presenter,
             }
-            for presenter in next_meeting.presenters.all()
+            for presentation in next_meeting.presenthistory_set.all()
         ]
 
         # Get other future meetings.
-        type1, type2 = [
-            [m.get_present_type_display(), m.last_rotation]
-            for m in (prev_meeting, next_meeting)
-        ]
         date = next_meeting.date
-        for i in range(5):
-            for t in (type1, type2):
-                next_rotation1 = t[1].get_after()
-                next_rotation2 = next_rotation1.get_after()
-                t[1] = next_rotation2
+        last_rotation = next_meeting.last_rotation
+        for t in ('another_type', 'present_type'):
+            for i in range(models.PresentRotation.objects.all().count()):
+                next_rotation1 = last_rotation.get_after()
+                last_rotation = next_rotation1.get_after()
 
                 date = models.MeetingHistory.get_next_meeting_date(date)
                 while models.MeetingSkip.objects.filter(date=date).exists():
@@ -57,11 +53,14 @@ class ScheduleView(SingleTableView):
 
                     date = models.MeetingHistory.get_next_meeting_date(date)
 
-                for r in (next_rotation1, next_rotation2):
+                for r in (next_rotation1, last_rotation):
                     result += [{
                         'date': date,
-                        'present_type': t[0],
-                        'presenter': r.presenter
+                        'presenter': r.presenter,
+                        'present_type': getattr(
+                            r.presenter.presenthistory_set.filter(is_specially_arranged=False)[0],
+                            t
+                        ),
                     }]
 
         return result
@@ -87,13 +86,13 @@ class HistoryView(SingleTableView):
 
         return models.PresentHistory.objects.values(
             date=F('meeting__date'),
-            present_type=F('meeting__present_type'),
+            presentation_type=F('present_type'),
             presenter_name=F('presenter__name'),
             present_content=F('content'),
         ).exclude(meeting__date=future_meeting.date).order_by().union(
             models.MeetingSkip.objects.all().values(
                 'date',
-                present_type=Concat(V('Postponed: '), 'reason'),
+                presentation_type=Concat(V('Postponed: '), 'reason'),
                 presenter_name=empty_str,
                 present_content=empty_str,
             ).filter(date__lte=date.today()).order_by()

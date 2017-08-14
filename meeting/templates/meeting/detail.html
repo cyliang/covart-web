@@ -15,7 +15,7 @@
             {% endif %}
             </a>
             <div class="divider"> / </div>
-            <div class="active section">{{ object.date }}: {{ object.get_present_type_display }}</div>
+            <div class="active section">{{ object }}</div>
         </div>
         <h2 class="ts dividing header">Meeting Detail</h2>
 
@@ -32,7 +32,7 @@
                         Edit
                     </a>
                     {% endif %}
-                    {{ object.get_present_type_display|title }}
+                    {{ presentation.get_present_type_display|title }}
                 </div>
             </h5>
             <div class="ts bottom attached segment">

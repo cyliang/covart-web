@@ -13,8 +13,9 @@
 <div class="ts two column stackable centered grid">
     <div class="column">
     <div class="ts two cards">
-    {% for presenter in meeting.presenters.all %}
-        {% if meeting.present_type == meeting.type_choices.0.0 %}
+    {% for presentation in meeting.presenthistory_set.all %}
+        {% with presenter=presentation.presenter %}
+        {% if presentation.present_type == presentation.PAPER_PRESENTATION %}
         <div class="ts raised info card">
         {% else %}
         <div class="ts raised negative card">
@@ -30,10 +31,11 @@
                 <div class="header">{{ presenter.name }}</div>
                 <div class="meta">{{ presenter.email }}</div>
                 <div class="description">
-                    <p>{{ meeting.get_present_type_display }}</p>
+                    <p>{{ presentation.get_present_type_display }}</p>
                 </div>
             </div>
         </div>
+        {% endwith %}
     {% endfor %}
     </div>
     </div>

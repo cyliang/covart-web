@@ -12,7 +12,6 @@ def send_meeting_notification(base_url, *recipients):
 
     data = {
         'meeting': next_meeting,
-        'presenters': next_meeting.presenters.all(),
         'base_url': base_url,
     }
 
