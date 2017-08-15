@@ -69,7 +69,7 @@ def send_meeting_notification(base_url, *recipients):
         ret = 'Meeting postponing message sent'
     else:
         template_name = 'meeting/notify_email'
-        subject = next_meeting.date.strftime('Group Meeting Notification (%m/%d)')
+        subject = next_meeting.get_email_title()
         ret = 'Meeting notification for %s sent.' % unicode(next_meeting)
 
     text_body = render_to_string(template_name + '.txt', data)

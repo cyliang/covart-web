@@ -1,0 +1,7 @@
+The presenter {{ presentation.presenter }} has updated his presentation content for the group meeting held on {{ presentation.meeting.date }}:
+
+{{ presentation.content }}
+
+For further detail:
+{{ base_url }}{{ presentation.meeting.get_absolute_url }}
+

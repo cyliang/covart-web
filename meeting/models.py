@@ -100,6 +100,9 @@ class MeetingHistory(models.Model):
             'present_rate': (on_time + late) * 100 / expected if expected != 0 else 100,
         }
 
+    def get_email_title(self):
+        return self.date.strftime('Group Meeting Notification (%m/%d)')
+
     @classmethod
     def get_next_meeting_date(cls, from_date=None):
         """

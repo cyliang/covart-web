@@ -1,0 +1,13 @@
+<p>
+The presenter {{ presentation.presenter }} has updated his presentation content for the group meeting held on {{ presentation.meeting.date }}:
+</p>
+<div style="background-color: #f0f0f0">
+{{ presentation.content|linebreaks }}
+</div>
+<p>
+Click the following link for further detail:<br>
+<a href="{{ base_url }}{{ presentation.meeting.get_absolute_url }}">
+    {{ base_url }}{{ presentation.meeting.get_absolute_url }}
+</a>
+</p>
+

@@ -4,7 +4,10 @@ from django.urls import reverse
 from django.db.models import ExpressionWrapper, CharField, Value as V, F, Max
 from django.db.models.functions import Concat
 from django.forms import widgets, modelformset_factory
+from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin
+from django.core.mail import EmailMultiAlternatives
+from django.template.loader import render_to_string
 from django_tables2 import SingleTableView
 from datetime import timedelta, date
 from . import tables, models, forms
@@ -174,3 +177,24 @@ class PresentUpdateView(UpdateView):
 
     def get_success_url(self):
         return self.object.meeting.get_absolute_url()
+
+    def form_valid(self, form):
+        if form.cleaned_data['email_notification']:
+            # Send notification if the presenter desire.
+            data = {
+                'presentation': self.object,
+                'base_url': settings.BASE_URL,
+            }
+
+            text_body = render_to_string('meeting/update_content_email.txt', data)
+            html_body = render_to_string('meeting/update_content_email.html', data)
+
+            mail = EmailMultiAlternatives(
+                subject=self.object.meeting.get_email_title(),
+                body=text_body,
+                to=[settings.NOTIFICATION_EMAIL_TO],
+            )
+            mail.attach_alternative(html_body, 'text/html')
+            mail.send()
+
+        return super(PresentUpdateView, self).form_valid(form)

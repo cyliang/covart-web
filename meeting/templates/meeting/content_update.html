@@ -57,7 +57,7 @@
                 {{ form.content }}
             </div>
             <div class="field">
-                <div class="ts disabled checkbox">
+                <div class="ts{% if form.email_notification.field.disabled %} disabled{% endif %} checkbox">
                     {{ form.email_notification }}
                     <label for="{{ form.email_notification.id_for_label }}">
                         Send a notification email to everyone.
