@@ -198,3 +198,44 @@ class PresentUpdateView(UpdateView):
             mail.send()
 
         return super(PresentUpdateView, self).form_valid(form)
+
+
+class TakeLeaveView(LoginRequiredMixin, UpdateView):
+    model = models.MeetingAttendance
+    form_class = forms.TakeLeaveForm
+    template_name = 'meeting/take_leave.html'
+
+    def get_object(self):
+        return self.model.objects.get(
+            meeting__date=self.kwargs['meeting'],
+            member=self.request.user.member,
+        )
+
+    def get_success_url(self):
+        return self.object.meeting.get_absolute_url()
+
+    def form_valid(self, form):
+        if form.cleaned_data['email_notification']:
+            # Send notification if desired.
+            data = {
+                'attendance': self.object,
+                'base_url': settings.BASE_URL,
+            }
+
+            text_body = render_to_string('meeting/take_leave_email.txt', data)
+            html_body = render_to_string('meeting/take_leave_email.html', data)
+
+            mail = EmailMultiAlternatives(
+                subject=self.object.meeting.get_email_title(),
+                body=text_body,
+                to=[settings.NOTIFICATION_EMAIL_TO],
+            )
+            mail.attach_alternative(html_body, 'text/html')
+            mail.send()
+
+        if date.today() < self.object.meeting.date:
+            self.object.status = models.MeetingAttendance.LEAVE_BEFORE
+        elif self.object.status != models.MeetingAttendance.LEAVE_BEFORE:
+            self.object.status = models.MeetingAttendance.LEAVE_AFTER
+
+        return super(TakeLeaveView, self).form_valid(form)

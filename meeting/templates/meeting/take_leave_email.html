@@ -1,0 +1,12 @@
+<p>
+{{ attendance.member }} has requested a leave for the meeting held on {{ attendance.meeting.date }} for this reason:
+</p>
+<div style="background-color: #f0f0f0">
+{{ attendance.reason|linebreaks }}
+</div>
+<p>
+Click the following link for further detail about that meeting:<br>
+<a href="{{ base_url }}{{ attendance.meeting.get_absolute_url }}">
+    {{ base_url }}{{ attendance.meeting.get_absolute_url }}
+</a>
+</p>

@@ -1,0 +1,6 @@
+{{ attendance.member }} has requested a leave for the meeting held on {{ attendance.meeting.date }} for this reason:
+
+{{ attendance.reason }}
+
+for further detail about that meeting:
+{{ base_url }}{{ attendance.meeting.get_absolute_url }}

@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Take Leave{% endblock %}
+
+{% block content %}
+    <div class="ts container">
+        <div class="ts breadcrumb">
+            {% if object.meeting.not_yet_happened %}
+            <a class="section" href="{% url 'meeting:schedule' %}">
+                Meeting schedule
+            {% else %}
+            <a class="section" href="{% url 'meeting:history' %}">
+                Meeting history
+            {% endif %}
+            </a>
+            <div class="divider"> / </div>
+            <a class="section" href="{{ object.meeting.get_absolute_url }}">
+                {{ object.meeting }}
+            </a>
+            <div class="divider"> / </div>
+            <div class="active section">
+                Take leave: {{ object.member }}
+            </div>
+        </div>
+        <h2 class="ts dividing header">
+            Take Leave for {{ object.meeting }}
+        </h2>
+
+        <div class="ts warning icon large message">
+            <i class="caution icon"></i>
+            <div class="content">
+                <div class="header">Note</div>
+                <p>You should have requested a leave to the advisor before filling
+                this form to finish the process to take leave.</p>
+            </div>
+        </div>
+
+        {% include 'meeting/brief-info.html' with meeting=object.meeting %}
+
+        <form class="ts form" method="post" action="">
+            {% csrf_token %}
+            <div class="field">
+                {{ form.reason.label_tag }}
+                {{ form.reason }}
+            </div>
+            <div class="field">
+                <div class="ts{% if form.email_notification.field.disabled %} disabled{% endif %} checkbox">
+                    {{ form.email_notification }}
+                    <label for="{{ form.email_notification.id_for_label }}">
+                        Send a notification email to everyone.
+                    </label>
+                </div>
+            </div>
+
+            <button class="ts info button" type="submit">
+                Confirm
+            </button>
+        </form>
+    </div>
+{% endblock %}
+

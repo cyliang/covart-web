@@ -11,3 +11,11 @@ class PresentUpdateForm(ModelForm):
     class Meta:
         model = models.PresentHistory
         fields = ['content', 'email_notification']
+
+
+class TakeLeaveForm(ModelForm):
+    email_notification = BooleanField(required=False, disabled=not can_notify())
+
+    class Meta:
+        model = models.MeetingAttendance
+        fields = ['reason', 'email_notification']
