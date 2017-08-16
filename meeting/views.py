@@ -10,7 +10,7 @@ from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django_tables2 import SingleTableView
 from datetime import timedelta, date
-from . import tables, models, forms
+from . import tables, models, forms, filters
 from website import models as website_models
 
 class ScheduleView(SingleTableView):
@@ -251,6 +251,14 @@ class AttendanceStatView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super(AttendanceStatView, self).get_context_data(**kwargs)
 
+        filterset_kwargs = {
+            'data': self.request.GET or None,
+            'request': self.request,
+        }
+        meeting_filterset = filters.AttendanceStatMeetingFilter(**filterset_kwargs)
+        member_filterset = filters.AttendanceStatMemberFilter(**filterset_kwargs)
+        context['filterset'] = meeting_filterset
+
         MA = models.MeetingAttendance
         expected = Sum(Case(
             When(meetingattendance__status=MA.ON_BUSINESS, then=0),
@@ -275,8 +283,8 @@ class AttendanceStatView(LoginRequiredMixin, TemplateView):
             'ontime_of_present': V(100) * ontime / present,
         }
 
-        meeting = models.MeetingHistory.objects.order_by('-date').annotate(**annotation).exclude(ontime_of_present=None)[:10]
-        member = website_models.Member.objects.filter(graduate_date=None).annotate(**annotation).exclude(ontime_of_present=None)
+        meeting = meeting_filterset.qs.order_by('-date').annotate(**annotation).exclude(ontime_of_present=None)[:10]
+        member = member_filterset.qs.filter(graduate_date=None).annotate(**annotation).exclude(ontime_of_present=None)
 
         def access_factory(idx):
             return lambda obj: getattr(obj, idx)

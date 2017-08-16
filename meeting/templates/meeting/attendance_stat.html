@@ -5,6 +5,21 @@
 {% block content %}
 <div class="ts container">
     <h2 class="ts dividing header">Attendance Statistic</h2>
+    <form class="ts form" method="get" action="">
+        {% csrf_token %}
+        <div class="inline fields">
+            {% for field in filterset.form %}
+            <div class="five wide field">
+                {{ field }}
+            </div>
+            {% endfor %}
+
+            <div class="field">
+                <button type="submit" class="ts button">Filter</button>
+            </div>
+        </div>
+    </form>
+
     <h4>Meeting Attendance Status</h4>
     <canvas id="meeting" width="800" height="400"></canvas>
 
@@ -43,6 +58,7 @@ new Chart(document.getElementById('meeting').getContext('2d'), {
             yAxes: [{
                 ticks: {
                     beginAtZero:true,
+                    suggestedMax: 100,
                     callback: function(value, index, values) {
                         return value + '%';
                     }
@@ -82,6 +98,7 @@ new Chart(document.getElementById('member').getContext('2d'), {
             yAxes: [{
                 ticks: {
                     beginAtZero:true,
+                    suggestedMax: 100,
                     callback: function(value, index, values) {
                         return value + '%';
                     }
