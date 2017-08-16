@@ -1,7 +1,7 @@
 from django.shortcuts import redirect
-from django.views.generic import DetailView, UpdateView
+from django.views.generic import DetailView, UpdateView, TemplateView
 from django.urls import reverse
-from django.db.models import ExpressionWrapper, CharField, Value as V, F, Max
+from django.db.models import ExpressionWrapper, CharField, Value as V, F, Max, Case, When, Sum, IntegerField
 from django.db.models.functions import Concat
 from django.forms import widgets, modelformset_factory
 from django.conf import settings
@@ -11,6 +11,7 @@ from django.template.loader import render_to_string
 from django_tables2 import SingleTableView
 from datetime import timedelta, date
 from . import tables, models, forms
+from website import models as website_models
 
 class ScheduleView(SingleTableView):
     """
@@ -242,3 +243,53 @@ class TakeLeaveView(LoginRequiredMixin, UpdateView):
             self.object.status = models.MeetingAttendance.LEAVE_AFTER
 
         return super(TakeLeaveView, self).form_valid(form)
+
+
+class AttendanceStatView(LoginRequiredMixin, TemplateView):
+    template_name = 'meeting/attendance_stat.html'
+
+    def get_context_data(self, **kwargs):
+        context = super(AttendanceStatView, self).get_context_data(**kwargs)
+
+        MA = models.MeetingAttendance
+        expected = Sum(Case(
+            When(meetingattendance__status=MA.ON_BUSINESS, then=0),
+            default=1,
+            output_field=IntegerField()
+        ))
+        ontime = Sum(Case(
+            When(meetingattendance__status=MA.PRESENT_ON_TIME, then=1),
+            default=0,
+            output_field=IntegerField()
+        ))
+        present = Sum(Case(
+            When(meetingattendance__status=MA.LATE, then=1),
+            When(meetingattendance__status=MA.PRESENT_ON_TIME, then=1),
+            default=0,
+            output_field=IntegerField()
+        ))
+
+        annotation = {
+            'ontime_percentage': V(100) * ontime / expected,
+            'present_percentage': V(100) * present / expected,
+            'ontime_of_present': V(100) * ontime / present,
+        }
+
+        meeting = models.MeetingHistory.objects.order_by('-date').annotate(**annotation).exclude(ontime_of_present=None)[:10]
+        member = website_models.Member.objects.filter(graduate_date=None).annotate(**annotation).exclude(ontime_of_present=None)
+
+        def access_factory(idx):
+            return lambda obj: getattr(obj, idx)
+
+        for m, x in (('meeting', 'date'), ('member', 'name')):
+            qset = vars()[m]
+
+            context[m] = {
+                'x': reversed(map(access_factory(x), qset)),
+            }
+            context[m].update({
+                key: reversed(map(access_factory(key), qset))
+                for key in annotation.keys()
+            })
+
+        return context

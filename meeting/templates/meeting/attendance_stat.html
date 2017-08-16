@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}Attendance Statistic{% endblock %}
+
+{% block content %}
+<div class="ts container">
+    <h2 class="ts dividing header">Attendance Statistic</h2>
+    <h4>Meeting Attendance Status</h4>
+    <canvas id="meeting" width="800" height="400"></canvas>
+
+    <h4>Member Attendance Status</h4>
+    <canvas id="member" width="800" height="400"></canvas>
+</div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.6.0/Chart.min.js"></script>
+<script>
+new Chart(document.getElementById('meeting').getContext('2d'), {
+    type: 'line',
+    data: {
+        labels: ["{{ meeting.x|join:'", "' }}"],
+        datasets: [
+            {
+                label: 'On time rate',
+                data: [{{ meeting.ontime_percentage|join:', ' }}],
+                backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                borderColor: 'rgba(255,99,132,1)'
+            },
+            {
+                label: 'Present rate',
+                data: [{{ meeting.present_percentage|join:', ' }}],
+                backgroundColor: 'rgba(54, 162, 235, 0.2)',
+                borderColor: 'rgba(54, 162, 235, 1)'
+            },
+            {
+                label: 'On time of present rate',
+                data: [{{ meeting.ontime_of_present|join:', ' }}],
+                backgroundColor: 'rgba(255, 206, 86, 0.2)',
+                borderColor: 'rgba(255, 206, 86, 1)'
+            }
+        ]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true,
+                    callback: function(value, index, values) {
+                        return value + '%';
+                    }
+                }
+            }]
+        }
+    }
+});
+
+new Chart(document.getElementById('member').getContext('2d'), {
+    type: 'bar',
+    data: {
+        labels: ["{{ member.x|join:'", "' }}"],
+        datasets: [
+            {
+                label: 'On time rate',
+                data: [{{ member.ontime_percentage|join:', ' }}],
+                backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                borderColor: 'rgba(75, 192, 192, 1)'
+            },
+            {
+                label: 'Present rate',
+                data: [{{ member.present_percentage|join:', ' }}],
+                backgroundColor: 'rgba(153, 102, 255, 0.2)',
+                borderColor: 'rgba(153, 102, 255, 1)'
+            },
+            {
+                label: 'On time of present rate',
+                data: [{{ member.ontime_of_present|join:', ' }}],
+                backgroundColor: 'rgba(255, 159, 64, 0.2)',
+                borderColor: 'rgba(255, 159, 64, 1)'
+            }
+        ]
+    },
+    options: {
+        scales: {
+            yAxes: [{
+                ticks: {
+                    beginAtZero:true,
+                    callback: function(value, index, values) {
+                        return value + '%';
+                    }
+                }
+            }]
+        }
+    }
+});
+</script>
+{% endblock %}
