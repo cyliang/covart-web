@@ -51,3 +51,17 @@ class HistoryTable(tables.Table):
         if 'Postponed' not in value:
             value = type_tr[value]
         return value
+
+
+class MemberPresentHistoryTable(tables.Table):
+    class Meta:
+        model = models.PresentHistory
+        fields = ['meeting.date', 'present_type', 'content']
+        attrs = {'class': 'ts selectable fixed single line table'}
+        row_attrs = {
+            'class': lambda record: 'clickable indicated ' + (
+                'info' if record.present_type == record.PAPER_PRESENTATION
+                else 'negative'
+            ),
+            'onclick': lambda record: "window.location='%s';" % record.meeting.get_absolute_url(),
+        }

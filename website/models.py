@@ -46,6 +46,12 @@ class Member(models.Model):
     def __unicode__(self):
         return self.name
 
+    def get_absolute_url(self):
+        return reverse('website:member-detail', kwargs={
+            'pk': self.pk,
+            'name': self.name,
+        })
+
 
 def activity_picture_path(instance, filename):
     return 'activity_pictures/%s-%d-%s' % (

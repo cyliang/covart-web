@@ -95,7 +95,7 @@
 
         <div class="ts doubling eight cards">
         {% for member in member_list|dictsortreversed:'status' %}
-            <a class="ts
+            <a href="{{ member.member.get_absolute_url }}" class="ts
             {% if member.status == member.PRESENT_ON_TIME %}
             positive
             {% elif member.status == member.LEAVE_BEFORE %}

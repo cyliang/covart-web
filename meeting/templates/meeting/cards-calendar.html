@@ -15,9 +15,9 @@
     <div class="four wide computer eight wide mobile column">
         {% with presenter=presentation.presenter %}
         {% if presentation.present_type == presentation.PAPER_PRESENTATION %}
-        <div class="ts raised info card">
+        <a class="ts raised info card" href="{{ presenter.get_absolute_url }}">
         {% else %}
-        <div class="ts raised negative card">
+        <a class="ts raised negative card" href="{{ presenter.get_absolute_url }}">
         {% endif %}
             <div class="image">
                 {% if presenter.picture != '' %}
@@ -33,7 +33,7 @@
                     <p>{{ presentation.get_present_type_display }}</p>
                 </div>
             </div>
-        </div>
+        </a>
         {% endwith %}
     </div>
     {% endfor %}
