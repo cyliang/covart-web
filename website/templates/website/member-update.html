@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+
+{% block title %}Update: {{ object.name }}{% endblock %}
+
+{% block content %}
+    <div class="ts container">
+        <div class="ts breadcrumb">
+            <a class="section" href="{% url 'website:members' %}">
+                Members
+            </a>
+            <div class="divider"> / </div>
+            <a class="section" href="{{ object.get_absolute_url }}">
+                {{ object }}
+            </a>
+            <div class="divider"> / </div>
+            <div class="active section">Profile Management</div>
+        </div>
+        <h2 class="ts dividing header">
+            Member Profile Management: {{ object.name }}
+        </h2>
+
+        <h4>Original Profile</h4>
+        {% include 'website/member-brief.html' with member=object %}
+
+        <h4>Update Profile</h4>
+        <form class="ts form" method="post" action="" enctype="multipart/form-data">
+            {% csrf_token %}
+            <div class="field">
+                {{ form.email.label_tag }}
+                {{ form.email }}
+            </div>
+            <div class="field">
+                <label>Change the picture</label>
+                {{ form.picture }}
+            </div>
+            <div class="field">
+                <div class="ts checkbox">
+                    {{ form.del_pic }}
+                    <label for="{{ form.del_pic.id_for_label }}">Remove the picture</label>
+                </div>
+            </div>
+
+            <button type="submit" class="ts warning button">Update</button>
+            <a class="ts button" href="{{ object.get_absolute_url }}">Cancel</a>
+        </form>
+    </div>
+{% endblock %}

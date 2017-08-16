@@ -1,4 +1,4 @@
-from django.views.generic import TemplateView, ListView, DetailView, FormView
+from django.views.generic import TemplateView, ListView, DetailView, FormView, UpdateView
 from django.contrib.auth.mixins import UserPassesTestMixin
 from django.urls import reverse
 from django_tables2 import SingleTableMixin
@@ -79,6 +79,21 @@ class MemberDetailView(FilterMixin, SingleTableMixin, DetailView):
         ] if expected > 0 else None
 
         return context
+
+
+class MemberUpdateView(UserPassesTestMixin, UpdateView):
+    model = models.Member
+    template_name = 'website/member-update.html'
+    form_class = forms.MemberUpdateForm
+
+    def form_valid(self, form):
+        if form.cleaned_data['del_pic']:
+            self.object.picture = ''
+
+        return super(MemberUpdateView, self).form_valid(form)
+
+    def test_func(self):
+        return self.get_object().user == self.request.user
 
 
 class PublicationListView(ListView):

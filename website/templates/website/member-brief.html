@@ -1,0 +1,49 @@
+{% load static %}
+
+<div class="ts segment">
+    <div class="ts grid">
+        <div class="column">
+            <div class="ts list">
+                <div class="item">
+                    <i class="mail icon"></i>
+                    <div class="content">
+                        <div class="header">Email</div>
+                        <div class="description">{{ member.email|default:"This member does not provide a public email." }}</div>
+                    </div>
+                </div>
+                <div class="item">
+                    <i class="plus icon"></i>
+                    <div class="content">
+                        <div class="header">Joined in</div>
+                        <div class="description">{{ member.join_date.year }}</div>
+                    </div>
+                </div>
+                {% if member.graduate_date %}
+                <div class="item">
+                    <i class="graduation icon"></i>
+                    <div class="content">
+                        <div class="header">Graduated in</div>
+                        <div class="description">{{ member.graduate_date.year }}</div>
+                    </div>
+                </div>
+                {% endif %}
+                {% if member.thesis %}
+                <div class="item">
+                    <i class="book icon"></i>
+                    <div class="content">
+                        <div class="header">Thesis</div>
+                        <div class="description">{{ member.thesis }}</div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+        <div class="right floated column">
+            {% if member.picture %}
+            <img class="ts small rounded image" src="{{ member.picture.url }}">
+            {% else %}
+            <img class="ts small rounded image" src="{% static 'website/unknown-person.png' %}">
+            {% endif %}
+        </div>
+    </div>
+</div>
