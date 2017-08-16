@@ -97,10 +97,10 @@
             {% if attendance %}
             <div class="ts fluid inverted statistics">
                 {% for stat in attendance %}
-                <div class="ts statistic">
+                <div class="ts statistic" style="margin: 0">
                     <div class="value">
                         {{ stat.percentage }}%
-                        <div class="fluctuation">{{ stat.num }}</div>
+                        <div class="tablet or large device only fluctuation">{{ stat.num }}</div>
                     </div>
                     <div class="label">{{ stat.label }}</div>
                 </div>
