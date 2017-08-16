@@ -17,12 +17,13 @@ from django.conf.urls import url, include
 from django.conf.urls.static import static
 from django.conf import settings
 from django.contrib import admin
-from django.views.generic import TemplateView
+from django.views.generic import RedirectView
 
 urlpatterns = [
     url(r'^meeting/', include('meeting.urls')),
     url(r'^', include('website.urls')),
     url(r'^oauth/', include('social_django.urls', namespace='social')),
     url(r'^', include('django.contrib.auth.urls')),
+    url(r'^admin/login', RedirectView.as_view(pattern_name='login', query_string=True)),
     url(r'^admin/', admin.site.urls),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT) + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

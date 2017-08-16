@@ -21,7 +21,7 @@
         </h2>
 
         {% if object.user == user %}
-        <a class="ts right floated tiny compact warning button" href="{% url 'website:member-update' pk=object.pk name=object.name %}">
+        <a class="ts right floated tiny compact warning button" href="{% url 'website:member-update' %}">
             Edit
         </a>
         <div class="ts hidden clearing divider"></div>
@@ -29,6 +29,7 @@
 
         {% include 'website/member-brief.html' with member=object %}
 
+        {% if user.is_authenticated %}
         <h4>Presentation History</h4>
         {% if object.presentrotation %}
         <div class="ts circular primary label">Currently in the rotation</div>
@@ -39,7 +40,6 @@
 
         {% render_table table %}
 
-        {% if user.is_authenticated %}
         <h4>Attendance Status</h4>
         <form class="ts tiny form" method="get" action="">
             <div class="inline fields">

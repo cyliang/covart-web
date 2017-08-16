@@ -5,7 +5,7 @@ from django.db.models import ExpressionWrapper, CharField, Value as V, F, Max
 from django.db.models.functions import Concat
 from django.forms import widgets, modelformset_factory
 from django.conf import settings
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django_tables2 import SingleTableView
@@ -91,7 +91,7 @@ class ScheduleView(SingleTableView):
 
         return context
 
-class HistoryView(SingleTableView):
+class HistoryView(LoginRequiredMixin, SingleTableView):
     table_class = tables.HistoryTable
     template_name = 'meeting/history.html'
 
@@ -114,13 +114,13 @@ class HistoryView(SingleTableView):
         ).order_by('-date')
 
 
-class MeetingDetailView(DetailView):
+class MeetingDetailView(LoginRequiredMixin, DetailView):
     model = models.MeetingHistory
     template_name = 'meeting/detail.html'
     slug_field = 'date'
 
 
-class AttendanceEditView(LoginRequiredMixin, MeetingDetailView):
+class AttendanceEditView(MeetingDetailView):
     AttendanceFormSet = modelformset_factory(
         models.MeetingAttendance,
         fields=('meeting', 'member', 'status', 'reason'),
@@ -170,7 +170,7 @@ class AttendanceEditView(LoginRequiredMixin, MeetingDetailView):
             return self.formset_invalid(formset)
 
 
-class PresentUpdateView(UpdateView):
+class PresentUpdateView(UserPassesTestMixin, UpdateView):
     model = models.PresentHistory
     form_class = forms.PresentUpdateForm
     template_name = 'meeting/content_update.html'
@@ -198,6 +198,9 @@ class PresentUpdateView(UpdateView):
             mail.send()
 
         return super(PresentUpdateView, self).form_valid(form)
+
+    def test_func(self):
+        return self.get_object().presenter == self.request.user.member
 
 
 class TakeLeaveView(LoginRequiredMixin, UpdateView):

@@ -1,5 +1,5 @@
 from django.views.generic import TemplateView, ListView, DetailView, FormView, UpdateView
-from django.contrib.auth.mixins import UserPassesTestMixin
+from django.contrib.auth.mixins import UserPassesTestMixin, LoginRequiredMixin
 from django.urls import reverse
 from django_tables2 import SingleTableMixin
 from django_filters.views import FilterMixin
@@ -81,19 +81,19 @@ class MemberDetailView(FilterMixin, SingleTableMixin, DetailView):
         return context
 
 
-class MemberUpdateView(UserPassesTestMixin, UpdateView):
+class MemberUpdateView(LoginRequiredMixin, UpdateView):
     model = models.Member
     template_name = 'website/member-update.html'
     form_class = forms.MemberUpdateForm
+
+    def get_object(self):
+        return self.request.user.member
 
     def form_valid(self, form):
         if form.cleaned_data['del_pic']:
             self.object.picture = ''
 
         return super(MemberUpdateView, self).form_valid(form)
-
-    def test_func(self):
-        return self.get_object().user == self.request.user
 
 
 class PublicationListView(ListView):
@@ -142,6 +142,6 @@ class ActivityDetailView(DetailView):
         return context
 
 
-class LinkListView(ListView):
+class LinkListView(LoginRequiredMixin, ListView):
     model = models.InternalLink
     template_name = 'website/link-list.html'

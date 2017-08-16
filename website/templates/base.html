@@ -54,7 +54,7 @@
                 </div>
                 <div class="menu">
                     {% if user.is_authenticated %}
-                    <a class="ts top attached card" href="{{ user.member.get_absolute_url }}">
+                    <div class="ts top attached card">
                         <div class="image">
                             {% if user.member.picture %}
                             <img src="{{ user.member.picture.url }}">
@@ -63,8 +63,10 @@
                             {% endif %}
                             <div class="header">{{ user.member.name }}</div>
                         </div>
-                    </a>
+                    </div>
                     <div class="divider"></div>
+                    <a class="item" href="{{ user.member.get_absolute_url }}">View profile</a>
+                    <a class="item" href="{% url 'website:member-update' %}">Update profile</a>
                     <a class="item" href="{% url 'logout' %}">Logout</a>
                     {% else %}
                     <a class="item" href="{% url 'login' %}">Login</a>
