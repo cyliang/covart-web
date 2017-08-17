@@ -22,16 +22,39 @@
         <h4>Original Profile</h4>
         {% include 'website/member-brief.html' with member=object %}
 
-        <h4>Update Profile</h4>
+        <h4>Update Your Public Profile</h4>
         <form class="ts form" method="post" action="" enctype="multipart/form-data">
             {% csrf_token %}
-            <div class="field">
+            <div class="{% if form.email.errors %}error {% endif %}field">
                 {{ form.email.label_tag }}
                 {{ form.email }}
+                {% if form.email.errors %}
+                <span class="message">
+                    {{ form.email.errors|join:'<br>' }}
+                </span>
+                {% endif %}
+                <small>
+                    This will be shown on your profile page in public.
+                    Changing this does not affect your internal email this site
+                    uses to send you notifications.
+                </small>
+                <small>
+                    You can clear this field if you don't want to show a public
+                    email on your profile page.
+                </small>
+            </div>
+            <div class="field">
+                {{ form.thesis.label_tag }}
+                {{ form.thesis }}
+                <small>This will be shown if you are graduated.</small>
+                <small>English version is recommanded.</small>
             </div>
             <div class="field">
                 <label>Change the picture</label>
                 {{ form.picture }}
+                <div class="message">
+                    Please upload a square image. Thanks.
+                </div>
             </div>
             <div class="field">
                 <div class="ts checkbox">

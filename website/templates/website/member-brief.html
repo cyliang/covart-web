@@ -7,8 +7,8 @@
                 <div class="item">
                     <i class="mail icon"></i>
                     <div class="content">
-                        <div class="header">Email</div>
-                        <div class="description">{{ member.email|default:"This member does not provide a public email." }}</div>
+                        <div class="header">{% if member.user == user %}Public {% endif %}Email</div>
+                        <div class="description">{{ member.email|default:"This member does not provide a public email."|urlize }}</div>
                     </div>
                 </div>
                 <div class="item">
@@ -47,3 +47,11 @@
         </div>
     </div>
 </div>
+{% if member.user == user %}
+<div class="ts info message">
+    <div class="header">Your Internal Email: {{ member.get_internal_email|urlize }}</div>
+    This email will receive notifications from this site and will not
+    be shown in public. If you want to change this email, please contact
+    the web staff.
+</div>
+{% endif %}

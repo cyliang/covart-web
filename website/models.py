@@ -52,6 +52,17 @@ class Member(models.Model):
             'name': self.name,
         })
 
+    def get_internal_email(self):
+        if not self.user:
+            return None
+
+        email = self.user.email
+        social = self.user.social_auth.filter(provider='google-auth2')
+        if not email and social.exists():
+            email = social[0].uid
+
+        return email
+
 
 def activity_picture_path(instance, filename):
     return 'activity_pictures/%s-%d-%s' % (

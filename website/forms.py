@@ -14,4 +14,4 @@ class MemberUpdateForm(forms.ModelForm):
 
     class Meta:
         model = models.Member
-        fields = ['email', 'picture', 'del_pic']
+        fields = ['email', 'thesis', 'picture', 'del_pic']

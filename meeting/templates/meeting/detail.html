@@ -36,7 +36,7 @@
                 </div>
             </h5>
             <div class="ts bottom attached segment">
-                {{ presentation.content|default:"The presenter did not provide his content."|linebreaks }}
+                {{ presentation.content|default:"The presenter did not provide his content."|linebreaks|urlize }}
             </div>
         {% endfor %}
 

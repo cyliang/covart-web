@@ -26,15 +26,7 @@ def send_rollcall_notification(base_url):
     html_body = render_to_string('meeting/rollcall_email.html', data)
 
     def get_email(member):
-        if not member.user:
-            return None
-
-        email = member.user.email
-        social = member.user.social_auth.filter(provider='google-auth2')
-        if not email and social.exists():
-            email = social[0].uid
-
-        return email
+        return member.get_internal_email()
 
     mail = EmailMultiAlternatives(
         subject=meeting.date.strftime('Rollcall Notification (%m/%d)'),
