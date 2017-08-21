@@ -100,16 +100,18 @@ class Publication(models.Model):
         (OTHER, OTHER),
     )
 
-    authors    = models.CharField(max_length=255)
+    authors    = models.CharField(max_length=255,
+                                  help_text='Comma-separated. Ex: Chih-Chen Kao, Wei-Chung Hsu')
     title      = models.CharField(max_length=255)
-    slug       = models.SlugField()
+    slug       = models.SlugField(help_text='This is generated automatically.')
     paper_type = models.CharField(max_length=255, choices=TYPE_CHOICE)
-    year       = models.IntegerField()
-    venue      = models.CharField(max_length=255)
+    year       = models.IntegerField(help_text='Ex: 2017')
+    venue      = models.CharField(max_length=255, help_text='Ex: VEE')
     pages      = models.CharField(max_length=255, blank=True)
     dblp_key   = models.CharField(max_length=255, blank=True)
     best_paper = models.BooleanField(default=False)
-    hidden     = models.BooleanField(default=False)
+    hidden     = models.BooleanField(default=False,
+                                     help_text='Check this if the paper is not that important.')
 
     class Meta:
         ordering = ['-year']
