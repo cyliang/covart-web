@@ -87,15 +87,29 @@ class Activity(models.Model):
 
 
 class Publication(models.Model):
+    CONFERENCE  = 'Conference and Workshop Papers'
+    JOURNAL     = 'Journal Articles'
+    TECH_REPORT = 'Technical Report'
+    PATENT      = 'Patent'
+    OTHER       = 'Other'
+    TYPE_CHOICE = (
+        (CONFERENCE, CONFERENCE),
+        (JOURNAL, JOURNAL),
+        (TECH_REPORT, TECH_REPORT),
+        (PATENT, PATENT),
+        (OTHER, OTHER),
+    )
+
     authors    = models.CharField(max_length=255)
     title      = models.CharField(max_length=255)
     slug       = models.SlugField()
-    paper_type = models.CharField(max_length=255, blank=True)
+    paper_type = models.CharField(max_length=255, choices=TYPE_CHOICE)
     year       = models.IntegerField()
     venue      = models.CharField(max_length=255)
     pages      = models.CharField(max_length=255, blank=True)
     dblp_key   = models.CharField(max_length=255, blank=True)
     best_paper = models.BooleanField(default=False)
+    hidden     = models.BooleanField(default=False)
 
     class Meta:
         ordering = ['-year']

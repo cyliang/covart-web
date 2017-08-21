@@ -20,9 +20,23 @@
         {% for pub_year in pub_years %}
             <h3>{{ pub_year.grouper }}</h3>
 
-            <div class="ts selection items">
-                {% include 'website/publication-items.html' with publications=pub_year.list %}
-            </div>
+            {% regroup pub_year.list|dictsort:'hidden' by hidden as pubs %}
+            {% for pub in pubs %}
+            {% if pub.grouper %}
+            <details class="ts accordion">
+                <summary>
+                    <i class="dropdown icon"></i> Others
+                </summary>
+                <div class="content">
+            {% endif %}
+                <div class="ts selection items">
+                    {% include 'website/publication-items.html' with publications=pub.list %}
+                </div>
+            {% if pub.grouper %}
+                </div>
+            </details>
+            {% endif %}
+            {% endfor %}
         {% endfor %}
     </div>
 {% endblock %}
