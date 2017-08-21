@@ -57,7 +57,7 @@ class Member(models.Model):
             return None
 
         email = self.user.email
-        social = self.user.social_auth.filter(provider='google-auth2')
+        social = self.user.social_auth.filter(provider='google-oauth2')
         if not email and social.exists():
             email = social[0].uid
 
