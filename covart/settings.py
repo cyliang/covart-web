@@ -37,6 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'django.contrib.humanize',
     'django_tables2',
     'django_q',
     'social_django',
@@ -115,7 +116,7 @@ LANGUAGE_CODE = 'zh-hant'
 
 TIME_ZONE = 'Asia/Taipei'
 
-USE_I18N = True
+USE_I18N = False
 
 USE_L10N = True
 

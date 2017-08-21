@@ -6,7 +6,7 @@ from . import models
 type_tr = dict(models.PresentHistory.type_choices)
 
 class ScheduleTable(tables.Table):
-    date = tables.DateColumn(verbose_name='Scheduled Date')
+    date = tables.DateColumn(verbose_name='Scheduled Date', short=False)
     present_type = tables.Column(verbose_name='Type', empty_values=())
     presenter = tables.Column(verbose_name='Presenter')
 
@@ -27,7 +27,7 @@ class ScheduleTable(tables.Table):
 
 
 class HistoryTable(tables.Table):
-    date = tables.DateColumn()
+    date = tables.DateColumn(short=False)
     present_type = tables.Column(verbose_name='Type', accessor='presentation_type')
     presenter = tables.Column(accessor='presenter_name')
     content = tables.Column(accessor='present_content')
