@@ -1,6 +1,12 @@
 The presenter {{ presentation.presenter }} has updated his presentation content for the group meeting held on {{ presentation.meeting.date }}:
 
+{% if paper %}
+{{ paper.authors }}.
+"{{ paper.title }}"
+{{ paper.venue }}, {{ paper.year }}.
+{% else %}
 {{ presentation.content }}
+{% endif %}
 
 For further detail:
 {{ base_url }}{{ presentation.meeting.get_absolute_url }}

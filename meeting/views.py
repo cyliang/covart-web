@@ -187,6 +187,9 @@ class PresentUpdateView(UserPassesTestMixin, UpdateView):
                 'base_url': settings.BASE_URL,
             }
 
+            if self.object.present_type == self.model.PAPER_PRESENTATION:
+                data['paper'] = website_models.Publication.get_from_keyword(self.object.content)
+
             text_body = render_to_string('meeting/update_content_email.txt', data)
             html_body = render_to_string('meeting/update_content_email.html', data)
 

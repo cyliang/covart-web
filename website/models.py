@@ -132,8 +132,7 @@ class Publication(models.Model):
         except ValueError:
             pass
         finally:
-            if result['status']['@code'] == '200' and (result['hits']['@total'] == '1'
-                    or int(result['hits']['@total']) > 0 and 'Wei-Chung Hsu' in result['hits']['hit'][0]['info']['authors']['author']):
+            if result['status']['@code'] == '200' and result['hits']['@total'] == '1':
                 info = result['hits']['hit'][0]['info']
 
                 obj = cls()

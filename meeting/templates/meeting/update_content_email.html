@@ -2,7 +2,14 @@
 The presenter {{ presentation.presenter }} has updated his presentation content for the group meeting held on {{ presentation.meeting.date }}:
 </p>
 <div style="background-color: #f0f0f0">
+{% if paper %}
+{{ paper.authors }}.<br>
+"<strong>{{ paper.title }}</strong>"<br>
+{{ paper.venue }}, {{ paper.year }}.<br>
+<a href="http://dblp.org/rec/{{ paper.dblp_key }}">View on dblp</a>
+{% else %}
 {{ presentation.content|linebreaks }}
+{% endif %}
 </div>
 <p>
 Click the following link for further detail:<br>
