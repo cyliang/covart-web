@@ -7,7 +7,21 @@ from datetime import timedelta, date
 def weekly_update():
     models.MeetingHistory.rotate_next_meeting()
 
-def send_rollcall_notification(base_url):
+def send_notification(body, recipients=None, subject=None, meeting=None, html_body=None):
+    if not subject and not meeting:
+        raise ValueError('There must be the argument "meeting" if the argument "subject" is missing.')
+
+    mail = EmailMultiAlternatives(
+        subject=subject or meeting.get_email_title(),
+        body=body,
+        to=recipients or [settings.NOTIFICATION_EMAIL_TO],
+    )
+    if html_body:
+        mail.attach_alternative(html_body, 'text/html')
+
+    mail.send()
+
+def rollcall_notification():
     """
     This task send a rollcall notification to each presenter.
     """
@@ -19,7 +33,7 @@ def send_rollcall_notification(base_url):
 
     data = {
         'meeting': meeting,
-        'base_url': base_url,
+        'base_url': settings.BASE_URL,
     }
 
     text_body = render_to_string('meeting/rollcall_email.txt', data)
@@ -28,20 +42,19 @@ def send_rollcall_notification(base_url):
     def get_email(member):
         return member.get_internal_email()
 
-    mail = EmailMultiAlternatives(
+    send_notification(
         subject=meeting.date.strftime('Rollcall Notification (%m/%d)'),
+        recipients=filter(lambda e: e != None, map(get_email, meeting.presenters.all())),
         body=text_body,
-        to=filter(lambda e: e != None, map(get_email, meeting.presenters.all())),
+        html_body=html_body,
     )
-    mail.attach_alternative(html_body, 'text/html')
-    mail.send()
 
-def send_meeting_notification(base_url, *recipients):
+def meeting_notification():
     next_meeting = models.MeetingHistory.objects.all()[:1][0]
 
     data = {
         'meeting': next_meeting,
-        'base_url': base_url,
+        'base_url': settings.BASE_URL,
     }
 
     if next_meeting.date - date.today() > timedelta(days=7):
@@ -67,12 +80,9 @@ def send_meeting_notification(base_url, *recipients):
     text_body = render_to_string(template_name + '.txt', data)
     html_body = render_to_string(template_name + '.html', data)
 
-    mail = EmailMultiAlternatives(
+    send_notification(
         subject=subject,
         body=text_body,
-        to=recipients,
+        html_body=html_body,
     )
-    mail.attach_alternative(html_body, 'text/html')
-    mail.send()
     return ret
-

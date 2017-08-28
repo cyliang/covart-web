@@ -9,6 +9,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django_tables2 import SingleTableView
+from django_q.tasks import async
 from datetime import timedelta, date
 from . import tables, models, forms, filters
 from website import models as website_models
@@ -193,13 +194,11 @@ class PresentUpdateView(UserPassesTestMixin, UpdateView):
             text_body = render_to_string('meeting/update_content_email.txt', data)
             html_body = render_to_string('meeting/update_content_email.html', data)
 
-            mail = EmailMultiAlternatives(
-                subject=self.object.meeting.get_email_title(),
+            async('meeting.tasks.send_notification',
+                meeting=self.object.meeting,
                 body=text_body,
-                to=[settings.NOTIFICATION_EMAIL_TO],
+                html_body=html_body,
             )
-            mail.attach_alternative(html_body, 'text/html')
-            mail.send()
 
         return super(PresentUpdateView, self).form_valid(form)
 
@@ -232,13 +231,11 @@ class TakeLeaveView(LoginRequiredMixin, UpdateView):
             text_body = render_to_string('meeting/take_leave_email.txt', data)
             html_body = render_to_string('meeting/take_leave_email.html', data)
 
-            mail = EmailMultiAlternatives(
-                subject=self.object.meeting.get_email_title(),
+            async('meeting.tasks.send_notification',
+                meeting=self.object.meeting,
                 body=text_body,
-                to=[settings.NOTIFICATION_EMAIL_TO],
+                html_body=html_body,
             )
-            mail.attach_alternative(html_body, 'text/html')
-            mail.send()
 
         if date.today() < self.object.meeting.date:
             self.object.status = models.MeetingAttendance.LEAVE_BEFORE
