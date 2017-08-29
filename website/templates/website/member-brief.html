@@ -1,5 +1,3 @@
-{% load static %}
-
 <div class="ts segment">
     <div class="ts grid">
         <div class="column">
@@ -39,11 +37,7 @@
             </div>
         </div>
         <div class="right floated column">
-            {% if member.picture %}
-            <img class="ts small rounded image" src="{{ member.picture.url }}">
-            {% else %}
-            <img class="ts small rounded image" src="{% static 'website/unknown-person.png' %}">
-            {% endif %}
+            <img class="ts small rounded image" src="{{ member.get_picture_url }}">
         </div>
     </div>
 </div>

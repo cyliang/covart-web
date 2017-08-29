@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load static %}
 
 {% block title %}
     Members
@@ -25,11 +24,7 @@
                     {% for member in member_identity.list %}
                         <a class="ts card" href="{{ member.get_absolute_url }}">
                             <div class="image">
-                                {% if member.picture != '' %}
-                                <img src="{{ member.picture.url }}">
-                                {% else %}
-                                <img src="{% static 'website/unknown-person.png' %}">
-                                {% endif %}
+                                <img src="{{ member.get_picture_url }}">
                             </div>
                             <div class="content">
                                 <div class="header">{{ member.name }}</div>
@@ -51,11 +46,7 @@
                 {% for member in member_year.list %}
                     <a class="item" href="{{ member.get_absolute_url }}">
                         <div class="ts tiny image">
-                            {% if member.picture != '' %}
-                            <img src="{{ member.picture.url }}">
-                            {% else %}
-                            <img src="{% static 'website/unknown-person.png' %}">
-                            {% endif %}
+                            <img src="{{ member.get_picture_url }}">
                         </div>
                         <div class="middle aligned content">
                             <div class="header">{{ member.name }}</div>

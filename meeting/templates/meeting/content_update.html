@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load static %}
 
 {% block title %}Presentation Detail Update{% endblock %}
 
@@ -36,11 +35,7 @@
         <div class="ts items">
             <div class="item">
                 <div class="ts tiny image">
-                    {% if presenter.picture != '' %}
-                    <img src="{{ object.presenter.picture.url }}">
-                    {% else %}
-                    <img src="{% static 'website/unknown-person.png' %}">
-                    {% endif %}
+                    <img src="{{ object.presenter.get_picture_url }}">
                 </div>
                 <div class="middle aligned content">
                     <div class="header">{{ object.presenter }}</div>

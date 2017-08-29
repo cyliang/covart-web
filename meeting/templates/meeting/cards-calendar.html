@@ -1,5 +1,3 @@
-{% load static %}
-
 <div class="ts grid">
     <div class="right floated column">
         <div class="ts rounded calendar">
@@ -20,11 +18,7 @@
         <a class="ts raised negative card" href="{{ presenter.get_absolute_url }}">
         {% endif %}
             <div class="image">
-                {% if presenter.picture != '' %}
-                <img src="{{ presenter.picture.url }}">
-                {% else %}
-                <img src="{% static 'website/unknown-person.png' %}">
-                {% endif %}
+                <img src="{{ presenter.get_picture_url }}">
             </div>
             <div class="content">
                 <div class="header">{{ presenter.name }}</div>

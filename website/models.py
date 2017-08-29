@@ -5,12 +5,15 @@ from django.utils.text import slugify
 from django.utils.timezone import now
 from django.conf import settings
 from django.urls import reverse
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from time import time
+from os.path import splitext
 import requests
 
 def member_picture_path(instance, filename):
-    return 'member_pictures/%d-%d-%s' % (
-        instance.pk, int(time()), filename
+    return 'member_pictures/%s-%d%s' % (
+        instance.name, int(time()),
+        splitext(filename)[-1],
     )
 
 class Member(models.Model):
@@ -63,10 +66,16 @@ class Member(models.Model):
 
         return email
 
+    def get_picture_url(self):
+        if self.picture:
+            return self.picture.url
+        return static('website/unknown-person.png')
+
 
 def activity_picture_path(instance, filename):
-    return 'activity_pictures/%s-%d-%s' % (
-        instance.slug, int(time()), filename
+    return 'activity_pictures/%d%s' % (
+        int(time()),
+        splitext(filename)[-1],
     )
 
 class Activity(models.Model):

@@ -44,11 +44,7 @@
             <div class="ts right item floating dropdown" style="padding: 0 10px 0 10px;">
                 <div class="text">
                     {% if user.is_authenticated %}
-                    {% if user.member.picture %}
-                    <img class="ts circular image" src="{{ user.member.picture.url }}" style="margin: 0">
-                    {% else %}
-                    <img class="ts circular image" src="{% static 'website/unknown-person.png' %}" style="margin: 0">
-                    {% endif %}
+                    <img class="ts circular image" src="{{ user.member.get_picture_url }}" style="margin: 0">
                     {% else %}
                     <i class="user icon" style="margin: auto"></i>
                     {% endif %}
@@ -57,11 +53,7 @@
                     {% if user.is_authenticated %}
                     <div class="ts top attached card">
                         <div class="image">
-                            {% if user.member.picture %}
-                            <img src="{{ user.member.picture.url }}">
-                            {% else %}
-                            <img src="{% static 'website/unknown-person.png' %}">
-                            {% endif %}
+                            <img src="{{ user.member.get_picture_url }}">
                             <div class="header">{{ user.member.name }}</div>
                         </div>
                     </div>

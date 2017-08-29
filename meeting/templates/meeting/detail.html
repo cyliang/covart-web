@@ -1,5 +1,4 @@
 {% extends 'base.html' %}
-{% load static %}
 
 {% block title %}Meeting Detail{% endblock %}
 
@@ -109,11 +108,7 @@
             {% endif %}
             raised card" {% if member.reason %}data-tooltip="{{ member.reason }}"{% endif %}>
                 <div class="image">
-                    {% if member.member.picture != '' %}
-                    <img src="{{ member.member.picture.url }}">
-                    {% else %}
-                    <img src="{% static 'website/unknown-person.png' %}">
-                    {% endif %}
+                    <img src="{{ member.member.get_picture_url }}">
                 </div>
                 <div class="content">
                     <div class="header">
