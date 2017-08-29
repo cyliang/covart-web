@@ -50,6 +50,8 @@ class Member(models.Model):
         return self.name
 
     def get_absolute_url(self):
+        if self.identity == self.ADVISOR:
+            return reverse('website:advisor')
         return reverse('website:member-detail', kwargs={
             'pk': self.pk,
             'name': self.name,

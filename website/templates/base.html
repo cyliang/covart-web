@@ -13,10 +13,10 @@
 </head>
 <body>
     {% block menu %}
-    {% if request.resolver_match.view_name != 'website:index' %}
-    <div class="ts raised menu">
-    {% else %}
+    {% if menu_attached %}
     <div class="ts attached inverted menu">
+    {% else %}
+    <div class="ts raised menu">
     {% endif %}
         <div class="ts container">
             <a class="image item" href="{% url 'website:index' %}">

@@ -29,15 +29,15 @@
     <p></p>
 
     <div class="ts container">
-        <h3 class="ts dividing header">Professor</h3>
+        <h3 class="ts dividing header">Lab Advisor</h3>
         <div class="ts selection items">
-            <a class="item" href="http://www.csie.ntu.edu.tw/~hsuwc" target="_blank">
+            <a class="item" href="{{ professor.get_absolute_url }}">
                 <div class="ts circular small image">
-                    <img src="{% static 'website/professor.jpg' %}">
+                    <img src="{{ professor.get_picture_url }}">
                 </div>
                 <div class="middle aligned content">
-                    <div class="header">Wei-Chung Hsu</div>
-                    <div class="meta">hsuwc@csie.ntu.edu.tw</div>
+                    <div class="header">Wei-Chung Hsu (徐慰中)</div>
+                    <div class="meta">{{ professor.email }}</div>
                     <div class="description">
                         Professor, Computer Science, National Taiwan University
                     </div>

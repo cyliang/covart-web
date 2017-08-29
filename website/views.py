@@ -12,6 +12,8 @@ class IndexView(TemplateView):
     def get_context_data(self, **kwargs):
         context = super(IndexView, self).get_context_data(**kwargs)
 
+        context['menu_attached'] = True
+        context['professor'] = models.Member.objects.get(identity=models.Member.ADVISOR)
         context['activities'] = models.Activity.objects.all()[:4]
         context['publications'] = models.Publication.objects.filter(hidden=False)[:5]
 
@@ -28,6 +30,16 @@ class MemberDetailView(FilterMixin, SingleTableMixin, DetailView):
     template_name = 'website/member-detail.html'
     table_class = meeting_tables.MemberPresentHistoryTable
     filterset_class = meeting_filters.AttendanceStatusFilter
+
+    def get_template_names(self):
+        if self.object.identity == self.model.ADVISOR:
+            return 'website/advisor.html'
+        return super(MemberDetailView, self).get_template_name()
+
+    def get_object(self):
+        if self.request.resolver_match.view_name == 'website:advisor':
+            return self.model.objects.get(identity=self.model.ADVISOR)
+        return super(MemberDetailView, self).get_object()
 
     def get_table_data(self):
         """
@@ -50,6 +62,10 @@ class MemberDetailView(FilterMixin, SingleTableMixin, DetailView):
         Add the filterset and the filtered attendance data into the context.
         """
         context = super(MemberDetailView, self).get_context_data(**kwargs)
+
+        # Special look for the advisor.
+        if self.object.identity == self.model.ADVISOR:
+            context['menu_attached'] = True
 
         filterset = self.get_filterset(self.get_filterset_class())
         MeetingAttendance = meeting_models.MeetingAttendance

@@ -3,6 +3,7 @@ from . import views
 
 urlpatterns = [
     url(r'^$', views.IndexView.as_view(), name='index'),
+    url(r'^advisor$', views.MemberDetailView.as_view(), name='advisor'),
     url(r'^member$', views.MemberListView.as_view(), name='members'),
     url(r'^member/(?P<pk>\d+)-(?P<name>[^/]+)$', views.MemberDetailView.as_view(), name='member-detail'),
     url(r'^profile/update$', views.MemberUpdateView.as_view(), name='member-update'),
