@@ -4,8 +4,6 @@
 
 {% block content %}
     <div class="ts container">
-        <h2 class="ts dividing header">Login</h2>
-
         <form class="ts form" method="post" action="{% url 'login' %}">
             {% csrf_token %}
             <input type="hidden" name="next" value="{{ next }}">
@@ -42,7 +40,15 @@
                 {% endif %}
             {% endif %}
 
-            <div class="ts dividing header">
+        <br><br>
+        <h2 class="ts center aligned header">
+            Login
+            <div class="sub header">Welcome Back!</div>
+        </h2>
+
+        <div class="ts segments">
+        <div class="ts centered secondary raised login segment">
+            <div class="ts header">
                 With Username and Password
             </div>
             <div class="field">
@@ -54,15 +60,28 @@
                 {{ form.password }}
                 <small>You need to have a valid password set for your account to login with username and password.</small>
             </div>
-            <button type="submit" class="ts primary button">Login</button>
+            <button type="submit" class="ts primary fluid button">Login</button>
+        </div>
 
-            <div class="ts dividing header">
+        <div class="ts centered tertiary raised login segment">
+            <div class="ts header">
                 With Social Network
             </div>
-            <a class="ts labeled icon positive basic button" href="{% url 'social:begin' 'google-oauth2' %}?{{ request.GET.urlencode }}">
+            <a class="ts labeled icon positive basic fluid button" href="{% url 'social:begin' 'google-oauth2' %}?{{ request.GET.urlencode }}">
                 <i class="google icon"></i>
                 Login with Google
             </a>
+        </div>
+        </div>
         </form>
+        <br><br>
     </div>
+
+    <style>
+        .login.segment {
+            max-width: 300px;
+        }
+    </style>
+{% endblock %}
+{% block footer %}
 {% endblock %}
