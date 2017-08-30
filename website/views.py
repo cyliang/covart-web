@@ -34,7 +34,7 @@ class MemberDetailView(FilterMixin, SingleTableMixin, DetailView):
     def get_template_names(self):
         if self.object.identity == self.model.ADVISOR:
             return 'website/advisor.html'
-        return super(MemberDetailView, self).get_template_name()
+        return super(MemberDetailView, self).get_template_names()
 
     def get_object(self):
         if self.request.resolver_match.view_name == 'website:advisor':
