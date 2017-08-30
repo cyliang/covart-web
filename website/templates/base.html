@@ -6,6 +6,7 @@
     {% google_analytics %}
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <meta name="author" content="Chih-Yung Liang">
+    <meta name="description" content="Laboratory led by prof. Wei-Chung Hsu for Compiler Optimization, Virtualization, and Adaptive Runtime">
 
     <title>Covart Lab - {% block title %}Compiler Optimization, Virtualization, and Adaptive Runtime{% endblock %}</title>
 
@@ -26,17 +27,36 @@
                 <div class="text">About</div>
                 <i class="dropdown icon"></i>
                 <div class="menu">
-                    <a class="item" href="{% url 'website:members' %}">Members</a>
-                    <a class="item" href="{% url 'website:publications' %}">Publications</a>
+                    <a class="item" href="{% url 'website:advisor' %}">
+                        <i class="user icon"></i>
+                        Lab Advisor
+                    </a>
+                    <a class="item" href="{% url 'website:members' %}">
+                        <i class="group icon"></i>
+                        Members
+                    </a>
+                    <a class="item" href="{% url 'website:publications' %}">
+                        <i class="book icon"></i>
+                        Publications
+                    </a>
                 </div>
             </div>
             <div class="ts item dropdown">
                 <div class="text">Meeting</div>
                 <i class="dropdown icon"></i>
                 <div class="menu">
-                    <a class="item" href="{% url 'meeting:schedule' %}">Schedule</a>
-                    <a class="item" href="{% url 'meeting:history' %}">History</a>
-                    <a class="item" href="{% url 'meeting:attendance' %}">Attendance Statistic</a>
+                    <a class="item" href="{% url 'meeting:schedule' %}">
+                        <i class="calendar outline icon"></i>
+                        Schedule
+                    </a>
+                    <a class="item" href="{% url 'meeting:history' %}">
+                        <i class="history icon"></i>
+                        History
+                    </a>
+                    <a class="item" href="{% url 'meeting:attendance' %}">
+                        <i class="bar chart icon"></i>
+                        Attendance Statistic
+                    </a>
                 </div>
             </div>
             <a class="item" href="{% url 'website:activities' %}">Activities</a>
@@ -58,11 +78,23 @@
                         </div>
                     </div>
                     <div class="divider"></div>
-                    <a class="item" href="{{ user.member.get_absolute_url }}">View profile</a>
-                    <a class="item" href="{% url 'website:member-update' %}">Update profile</a>
-                    <a class="item" href="{% url 'logout' %}">Logout</a>
+                    <a class="item" href="{{ user.member.get_absolute_url }}">
+                        <i class="id card outline icon"></i>
+                        View profile
+                    </a>
+                    <a class="item" href="{% url 'website:member-update' %}">
+                        <i class="edit icon"></i>
+                        Update profile
+                    </a>
+                    <a class="item" href="{% url 'logout' %}">
+                        <i class="sign out icon"></i>
+                        Logout
+                    </a>
                     {% else %}
-                    <a class="item" href="{% url 'login' %}">Login</a>
+                    <a class="item" href="{% url 'login' %}">
+                        <i class="sign in icon"></i>
+                        Login
+                    </a>
                     {% endif %}
                 </div>
             </div>

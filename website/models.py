@@ -76,7 +76,7 @@ class Member(models.Model):
 
 class MemberMeta(models.Model):
     member   = models.ForeignKey('Member', models.CASCADE)
-    category = models.CharField(max_length=255, help_text='Ex: Awards and Honors')
+    category = models.CharField(max_length=255, help_text='Awards and Honors, Editorial Position, General and Program Chairs, or Member of Committee')
     title    = models.CharField(max_length=255, help_text='Ex: Best Teaching Award')
     year     = models.IntegerField(help_text='Ex: 2017')
     meta     = models.TextField(blank=True, help_text='Ex: National Chiao-Tung University')
