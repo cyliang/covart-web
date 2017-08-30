@@ -12,6 +12,14 @@
             <div class="sub header">
                 Professor, Computer Science, National Taiwan University
             </div>
+            <div class="ts primary label">
+                <i class="ts mail icon"></i>
+                {{ object.email }}
+            </div>
+            <div class="ts label">
+                <i class="ts university icon"></i>
+                德田館 313室
+            </div>
         </div>
     </h3>
     <div class="ts hidden divider"></div>
@@ -23,46 +31,6 @@
         </a>
         <div class="ts hidden clearing divider"></div>
         {% endif %}
-
-        <h3>Contact</h3>
-        <div class="ts relaxed list">
-            <div class="item">
-                <i class="mail icon"></i>
-                <div class="content">
-                    <div class="header">Email</div>
-                    <div class="description">{{ object.email|urlize }}</div>
-                </div>
-            </div>
-            <div class="item">
-                <i class="phone icon"></i>
-                <div class="content">
-                    <div class="header">Phone</div>
-                    <div class="description">02-33664888 ext. 313</div>
-                </div>
-            </div>
-            <div class="item">
-                <i class="university icon"></i>
-                <div class="content">
-                    <div class="header">Office Room</div>
-                    <div class="description">德田館 313室</div>
-                </div>
-            </div>
-            <div class="item">
-                <i class="clock icon"></i>
-                <div class="content">
-                    <div class="header">Office Hour</div>
-                    <div class="description">Thursday: 10-12</div>
-                </div>
-            </div>
-            <div class="item">
-                <i class="linkedin square icon"></i>
-                <div class="content">
-                    <a class="header" href="https://www.linkedin.com/in/wei-chung-hsu-7a44b190" target="_blank">
-                        LinkedIn
-                    </a>
-                </div>
-            </div>
-        </div>
 
         <h3>Education</h3>
         <div class="ts divided items">
