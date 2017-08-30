@@ -8,6 +8,13 @@ class MemberAdmin(admin.ModelAdmin):
     list_filter = ('graduate_date', 'identity')
 
 
+@admin.register(models.MemberMeta)
+class MemberMetaAdmin(admin.ModelAdmin):
+    list_display = ('member', 'category', 'year', 'title')
+    list_filter = ('member', 'category', 'year')
+    search_fields = ('title', 'meta')
+
+
 @admin.register(models.Activity)
 class ActivityAdmin(admin.ModelAdmin):
     prepopulated_fields = {"slug": ("title",)}

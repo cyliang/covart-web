@@ -166,6 +166,55 @@
             </div>
         </div>
 
+        {% regroup object.membermeta_set.all by category as meta %}
+        {% for grouper, list in meta %}
+        <h3>{{ grouper }}</h3>
+        {% if 'award' in grouper|lower %}
+        <div class="ts segmented items">
+            {% for item in list %}
+            <div class="item">
+                <i class="ts big winner icon"></i>
+                <div class="content">
+                    <div class="header">{{ item.title }}</div>
+                    <div class="description">
+                        {{ item.meta|linebreaks }}
+                    </div>
+                </div>
+                <div class="ts top right attached info label">{{ item.year }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% elif 'chair' in grouper|lower %}
+        <div class="ts segmented items">
+            {% for item in list %}
+            <div class="item">
+                <i class="ts large user icon"></i>
+                <div class="content">
+                    <div class="header">{{ item.title }}</div>
+                    <div class="description">
+                        {{ item.meta|linebreaks }}
+                    </div>
+                </div>
+                <div class="ts top right attached info label">{{ item.year }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% else %}
+        <div class="ts very relaxed bulleted list">
+            {% for item in list %}
+            <div class="item">
+                <div class="content">
+                    <div class="header">{{ item.title }}, {{ item.year }}</div>
+                    <div class="description">
+                        {{ item.meta|linebreaks }}
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        {% endfor %}
+
         {% if user.is_authenticated %}
         <details class="ts accordion">
             <summary>

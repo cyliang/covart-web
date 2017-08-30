@@ -74,6 +74,20 @@ class Member(models.Model):
         return static('website/unknown-person.png')
 
 
+class MemberMeta(models.Model):
+    member   = models.ForeignKey('Member', models.CASCADE)
+    category = models.CharField(max_length=255, help_text='Ex: Awards and Honors')
+    title    = models.CharField(max_length=255, help_text='Ex: Best Teaching Award')
+    year     = models.IntegerField(help_text='Ex: 2017')
+    meta     = models.TextField(blank=True, help_text='Ex: National Chiao-Tung University')
+
+    class Meta:
+        ordering = ['category', '-year']
+
+    def __unicode__(self):
+        return '%s (%d)' % (self.title, self.year)
+
+
 def activity_picture_path(instance, filename):
     return 'activity_pictures/%d%s' % (
         int(time()),
