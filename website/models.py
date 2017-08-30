@@ -137,6 +137,7 @@ class Publication(models.Model):
     best_paper = models.BooleanField(default=False)
     hidden     = models.BooleanField(default=False,
                                      help_text='Check this if the paper is not that important.')
+    author_members = models.ManyToManyField('Member')
 
     class Meta:
         ordering = ['-year']

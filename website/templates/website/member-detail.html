@@ -28,6 +28,13 @@
 
         {% include 'website/member-brief.html' with member=object %}
 
+        {% if object.publication_set.exists %}
+        <h4>Publication Contribution</h4>
+        <div class="ts segmented selection items">
+            {% include 'website/publication-items.html' with publications=object.publication_set.all %}
+        </div>
+        {% endif %}
+
         {% if user.is_authenticated %}
         <h4>Presentation History</h4>
         {% if object.presentrotation %}
