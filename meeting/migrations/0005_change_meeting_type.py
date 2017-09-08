@@ -18,6 +18,13 @@ def inherit_meeting_type(apps, schema_editor):
             presentation.present_type = presentation.meeting.present_type
             presentation.save()
 
+def rev_func(apps, schema_editor):
+    MeetingHistory = apps.get_model('meeting', 'MeetingHistory')
+    for meeting in MeetingHistory.objects.all():
+        if meeting.presenthistory_set.exists():
+            meeting.present_type = meeting.presenthistory_set.all()[0].present_type
+            meeting.save()
+
 class Migration(migrations.Migration):
 
     dependencies = [
@@ -36,7 +43,7 @@ class Migration(migrations.Migration):
             field=models.CharField(choices=[('PAPER', 'Paper presentation'), ('PROGRESS', 'Progress report'), ('OTHER', 'Other')], default='OTHER', max_length=10),
             preserve_default=False,
         ),
-        migrations.RunPython(inherit_meeting_type),
+        migrations.RunPython(inherit_meeting_type, rev_func),
         migrations.RemoveField(
             model_name='meetinghistory',
             name='present_type',
