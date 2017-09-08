@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+{% load render_table from django_tables2 %}
+
+{% block title %}財產列表{% endblock %}
+
+{% block content %}
+    <div class="ts container">
+        <h2>財產列表</h2>
+
+        {% if perms.asset.add_asset %}
+        <a class="ts right floated tiny positive button" href="{% url 'admin:asset_asset_add' %}">
+            新增財產
+        </a>
+        <div class="ts hidden clearing divider"></div>
+        {% endif %}
+
+        {% render_table table %}
+    </div>
+
+    <style>
+        @media (max-width: 767px) {
+            td.remark, th.remark, td.custodian, th.custodian, td.years, th.years, td.date, th.date {
+                display: none;
+            }
+        }
+    </style>
+{% endblock %}

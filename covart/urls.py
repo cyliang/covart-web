@@ -21,6 +21,7 @@ from django.views.generic import RedirectView
 
 urlpatterns = [
     url(r'^meeting/', include('meeting.urls')),
+    url(r'^asset/', include('asset.urls')),
     url(r'^', include('website.urls')),
     url(r'^oauth/', include('social_django.urls', namespace='social')),
     url(r'^', include('django.contrib.auth.urls')),

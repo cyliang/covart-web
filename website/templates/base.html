@@ -120,13 +120,19 @@
             </div>
             <div class="tablet or large device only column" style="margin-top: auto; margin-bottom: auto;">
                 <div class="ts very compact mini separated buttons">
-                    <a class="ts basic button" href="{% url 'website:links' %}">Links (Internal use)</a>
+                    <a class="ts basic button" href="{% url 'website:links' %}">Links{% if not user.is_authenticated %} (Internal use){% endif %}</a>
+                    {% if user.is_authenticated %}
+                    <a class="ts basic info button" href="{% url 'asset:all' %}">財產</a>
+                    {% endif %}
                     <a class="ts basic negative button" href="{% url 'admin:index' %}">Admin</a>
                 </div>
             </div>
             <div class="mobile only sixteen wide column">
                 <div class="ts very compact mini fluid separated buttons">
-                    <a class="ts basic button" href="{% url 'website:links' %}">Links (Internal use)</a>
+                    <a class="ts basic button" href="{% url 'website:links' %}">Links{% if not user.is_authenticated %} (Internal use){% endif %}</a>
+                    {% if user.is_authenticated %}
+                    <a class="ts basic info button" href="{% url 'asset:all' %}">財產</a>
+                    {% endif %}
                     <a class="ts basic negative button" href="{% url 'admin:index' %}">Admin</a>
                 </div>
             </div>
