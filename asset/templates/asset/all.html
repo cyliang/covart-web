@@ -5,7 +5,7 @@
 
 {% block content %}
     <div class="ts container">
-        <h2>財產列表</h2>
+        <h2 class="ts dividing header">財產列表</h2>
 
         {% if perms.asset.add_asset %}
         <a class="ts right floated tiny positive button" href="{% url 'admin:asset_asset_add' %}">

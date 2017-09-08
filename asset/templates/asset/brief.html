@@ -1,0 +1,52 @@
+<div class="ts two column grid">
+    <div class="column">
+        <div class="ts segmented list">
+            <div class="item">
+                <i class="hashtag icon"></i>
+                <div class="content">
+                    <div class="header">財產標籤號碼</div>
+                    <div class="description">{{ asset.label }}</div>
+                </div>
+            </div>
+            <div class="item">
+                <i class="tag icon"></i>
+                <div class="content">
+                    <div class="header">物品類別</div>
+                    <div class="description">{{ asset.name }}</div>
+                </div>
+            </div>
+            <div class="item">
+                <i class="computer icon"></i>
+                <div class="content">
+                    <div class="header">描述</div>
+                    <div class="description">{{ asset.description }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="column">
+        <div class="ts segmented list">
+            <div class="item">
+                <i class="user icon"></i>
+                <div class="content">
+                    <div class="header">保管人</div>
+                    <div class="description">{{ asset.custodian }}</div>
+                </div>
+            </div>
+            <div class="item">
+                <i class="add to calendar icon"></i>
+                <div class="content">
+                    <div class="header">產標日期</div>
+                    <div class="description">{{ asset.date }}</div>
+                </div>
+            </div>
+            <div class="item">
+                <i class="long arrow right icon"></i>
+                <div class="content">
+                    <div class="header">年限</div>
+                    <div class="description">{{ asset.years }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

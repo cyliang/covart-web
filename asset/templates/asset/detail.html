@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load render_table from django_tables2 %}
+
+{% block title %}財產：{{ object.label }}{% endblock %}
+
+{% block content %}
+    <div class="ts container">
+        <div class="ts breadcrumb">
+            <a class="section" href="{% url 'asset:all' %}">
+                財產列表
+            </a>
+            <div class="divider"> / </div>
+            <div class="active section">{{ object }}</div>
+        </div>
+        <h2 class="ts dividing header">
+            財產：{{ object.label }}
+
+            {% if object.latest_log.status == object.latest_log.SCRAP %}
+            <div class="ts tiny negative label">已報廢</div>
+            {% elif object.latest_log.new_user %}
+            <div class="ts tiny primary label">使用中</div>
+            {% else %}
+            <div class="ts tiny positive label">閒置</div>
+            {% endif %}
+        </h2>
+
+        {% if object.latest_log.status != object.latest_log.SCRAP %}
+        {% if object.latest_log.new_user == user.member %}
+        <a class="ts labeled icon tiny info button" href="{% url 'asset:transfer' object.label %}">
+            <i class="undo icon"></i>
+            登記歸還
+        {% else %}
+        <a class="ts labeled icon tiny primary button" href="{% url 'asset:transfer' object.label %}">
+            <i class="exchange icon"></i>
+            登記使用
+        {% endif %}
+        </a>
+        {% if perms.asset.add_transferlog %}
+        <a class="ts labeled icon tiny negative button" href="{% url 'asset:scrap' object.label %}">
+            <i class="fire icon"></i>
+            報廢
+        </a>
+        {% endif %}
+        {% endif %}
+
+        <h4>財產資料</h4>
+        {% include 'asset/brief.html' with asset=object %}
+
+        {% if object.remark %}
+        <div class="ts info message">
+            <div class="header">備註</div>
+            {{ object.remark|linebreaks }}
+        </div>
+        {% endif %}
+
+        <div class="ts hidden clearing divider"></div>
+        <div class="ts two column grid">
+            <div class="column">
+                <h4>當前使用人</h4>
+                {% if object.latest_log.new_user %}
+                <a href="{{ object.latest_log.new_user.get_absolute_url }}">
+                    <img class="ts avatar image" src="{{ object.latest_log.new_user.get_picture_url }}">
+                    {{ object.latest_log.new_user }}
+                </a>
+                {% else %}
+                <p>無</p>
+                {% endif %}
+            </div>
+            <div class="column">
+                <h4>物品位置</h4>
+                <p>{{ object.latest_log.location|default:'未知' }}</p>
+            </div>
+        </div>
+
+        <div class="ts hidden clearing divider"></div>
+        <h4>轉移紀錄</h4>
+        <div class="ts divided items">
+            {% for log in object.transferlog_set.all %}
+            <div class="item">
+                {% if log.status == log.BUY %}
+                <i class="big positive add to cart icon"></i>
+                {% elif log.status == log.TRANSFER %}
+                <i class="big primary exchange icon"></i>
+                {% elif log.status == log.RETURN %}
+                <i class="big info undo icon"></i>
+                {% elif log.status == log.SCRAP %}
+                <i class="big negative fire icon"></i>
+                {% endif %}
+                <div class="content">
+                    <div class="header">
+                        {{ log.get_status_display }}
+                        {% if log.new_user %}
+                        ：
+                        <a href="{{ log.new_user.get_absolute_url }}">
+                            <img class="ts avatar image" src="{{ log.new_user.get_picture_url }}">
+                            {{ log.new_user }}
+                        </a>
+                        {% endif %}
+                    </div>
+                    <div class="meta">{{ log.time }}</div>
+                    {% if log.remark %}
+                    <div class="description">{{ log.remark }}</div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+{% endblock %}

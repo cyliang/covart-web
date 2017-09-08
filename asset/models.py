@@ -3,6 +3,7 @@ from __future__ import unicode_literals
 
 from django.db import models
 from django.core.exceptions import ValidationError
+from django.urls import reverse
 
 class Asset(models.Model):
     label       = models.CharField('產標編號', help_text='Ex: xxxxxxxxxx-yyyyy',
@@ -24,6 +25,11 @@ class Asset(models.Model):
 
     def __unicode__(self):
         return '%s: %s (%s)' % (self.label, self.name, self.description)
+
+    def get_absolute_url(self):
+        return reverse('asset:detail', kwargs={
+            'slug': self.label,
+        })
 
     @property
     def latest_log(self):
