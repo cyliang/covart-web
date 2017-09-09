@@ -7,14 +7,35 @@
     <div class="ts container">
         <h2 class="ts dividing header">財產列表</h2>
 
-        {% if perms.asset.add_asset %}
-        <a class="ts right floated tiny positive button" href="{% url 'admin:asset_asset_add' %}">
-            新增財產
-        </a>
-        <div class="ts hidden clearing divider"></div>
-        {% endif %}
+        <form class="ts tiny form" method="get" action="">
+            <div class="inline fields">
+                {% for field in filter.form %}
+                <div class="five wide field">
+                    {{ field.label_tag }}
+                    {{ field }}
+                </div>
+                {% endfor %}
+                <div class="field">
+                    <button type="submit" class="ts button">Filter</button>
+                </div>
+                {% if perms.asset.add_asset %}
+                <div class="field">
+                    <a class="ts right floated tiny positive button" href="{% url 'admin:asset_asset_add' %}">
+                        新增財產
+                    </a>
+                </div>
+                {% endif %}
+            </div>
+        </form>
+        <div class="ts clearing hidden divider"></div>
 
         {% render_table table %}
+        <div class="ts positive label">
+            無使用人
+        </div>
+        <div class="ts negative label">
+            已報廢
+        </div>
     </div>
 
     <style>
