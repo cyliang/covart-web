@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+
+{% block title %}登記財產使用{% endblock %}
+
+{% block content %}
+    <div class="ts container">
+        <div class="ts breadcrumb">
+            <a class="section" href="{% url 'asset:all' %}">財產列表</a>
+            <div class="divider"> / </div>
+            <a class="section" href="{{ asset.get_absolute_url }}">{{ asset }}</a>
+            <div class="divider"> / </div>
+            <div class="active section">
+                {% if action == 'take' %}
+                使用登記
+                {% else %}
+                歸還登記
+                {% endif %}
+            </div>
+        </div>
+        <h2 class="ts dividing header">
+            {% if action == 'take' %}
+            財產使用登記
+            {% else %}
+            財產歸還登記
+            {% endif %}
+        </h2>
+
+        <h4>財產資料</h4>
+        {% include 'asset/brief.html' with asset=asset %}
+
+        <div class="ts warning message">
+            <div class="header">
+                請核對財產資料
+            </div>
+            <div class="content">
+                {% if action == 'take' %}
+                經此登記作業登記使用該財產後，使用人應負其保管責任。
+                {% else %}
+                原財產使用人應與財產管理人確認財產歸還事宜。
+                {% endif %}
+            </div>
+        </div>
+
+        <h4>登記表單</h4>
+        <div class="ts top attached three steps">
+            <div class="disabled step">
+                <i class="remove user icon"></i>
+                <div class="content">
+                    <div class="title">原使用人</div>
+                    <div class="description">
+                        {{ asset.latest_log.new_user|default:'無' }}
+                    </div>
+                </div>
+            </div>
+            <div class="active step">
+                <i class="edit icon"></i>
+                <div class="content">
+                    <div class="title">登記</div>
+                </div>
+            </div>
+            <div class="step">
+                <i class="add user icon"></i>
+                <div class="content">
+                    <div class="title">登記後使用人</div>
+                    <div class="description">
+                        {% if action == 'take' %}
+                        {{ user.member }}
+                        {% else %}
+                        無
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="ts bottom attached segment">
+            <form class="ts form" action="" method="post">
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="field">
+                    {{ field.label_tag }}
+                    {{ field }}
+                    <small>{{ field.help_text }}</small>
+                </div>
+                {% endfor %}
+
+                <button type="submit" class="ts {% if action == 'take' %}primary{% else %}info{% endif %} right floated button">
+                    確定登記
+                </button>
+                <div class="ts clearing hidden fitted divider"></div>
+            </form>
+        </div>
+    </div>
+{% endblock %}
