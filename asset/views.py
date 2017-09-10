@@ -96,3 +96,20 @@ class LogTransferFormView(LoginRequiredMixin, AssetLoggingMixin, CreateView):
         context = super(LogTransferFormView, self).get_context_data(**kwargs)
         context['action'] = ['take', 'return'][self.asset.latest_log.new_user == self.request.user.member]
         return context
+
+
+class ScrapFormView(PermissionRequiredMixin, AssetLoggingMixin, CreateView):
+    permission_required = 'asset.add_transferlog'
+
+    model = models.TransferLog
+    fields = ('remark', )
+    template_name = 'asset/scrap.html'
+
+    def get_form_kwargs(self):
+        kwargs = super(ScrapFormView, self).get_form_kwargs()
+        kwargs['instance'] = self.model(
+            status=models.TransferLog.SCRAP,
+            asset=self.asset,
+            new_user=None,
+        )
+        return kwargs

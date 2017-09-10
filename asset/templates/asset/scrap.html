@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+
+{% block title %}登記財產報廢{% endblock %}
+
+{% block content %}
+    <div class="ts container">
+        <div class="ts breadcrumb">
+            <a class="section" href="{% url 'asset:all' %}">財產列表</a>
+            <div class="divider"> / </div>
+            <a class="section" href="{{ asset.get_absolute_url }}">{{ asset }}</a>
+            <div class="divider"> / </div>
+            <div class="active section">
+                報廢登記
+            </div>
+        </div>
+        <h2 class="ts dividing header">
+            報廢登記
+        </h2>
+
+        <h4>財產資料</h4>
+        {% include 'asset/brief.html' with asset=asset %}
+    </div>
+    <div class="ts hidden clearing divider"></div>
+
+    <br><br><br><br>
+    <div class="ts very narrow container">
+        <div class="ts negative top attached segmented header">
+            <i class="fire icon"></i>
+            報廢
+        </div>
+        <div class="ts bottom attached segment">
+            <form class="ts form" action="" method="post">
+                {% csrf_token %}
+                {% for field in form %}
+                <div class="field">
+                    {{ field.label_tag }}
+                    {{ field }}
+                </div>
+                {% endfor %}
+
+                <button type="submit" class="ts negative fluid button">
+                    確定報廢
+                </button>
+            </form>
+        </div>
+    </div>
+    <br><br><br><br>
+
+    <style>
+        #scrap-container {
+            max-width: 300px;
+        }
+    </style>
+{% endblock %}

@@ -4,6 +4,7 @@ from . import views
 urlpatterns = [
     url(r'^$', views.AssetTableView.as_view(), name='all'),
     url(r'^transfer/(?P<asset>.+)$', views.LogTransferFormView.as_view(), name='transfer'),
+    url(r'^scrap/(?P<asset>.+)$', views.ScrapFormView.as_view(), name='scrap'),
     url(r'^(?P<slug>.+)$', views.AssetDetailView.as_view(), name='detail'),
 ]
 
