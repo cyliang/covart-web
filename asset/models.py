@@ -7,15 +7,15 @@ from django.urls import reverse
 
 class Asset(models.Model):
     label       = models.CharField('產標編號', help_text='Ex: xxxxxxxxxx-yyyyy',
-                                   unique=True, max_length=255)
+                                   unique=True, max_length=100)
     name        = models.CharField('物品類別', help_text='Ex: 行動電話機',
-                                   max_length=255)
+                                   max_length=100)
     date        = models.DateField('產標日期')
     years       = models.SmallIntegerField('年限')
     custodian   = models.CharField('保管人', help_text='Ex: 徐慰中',
                                    max_length=50)
     description = models.CharField('描述', help_text='Ex: iPhone 6 plus',
-                                   max_length=255)
+                                   max_length=100)
     remark      = models.TextField('備註', help_text='Ex: 密碼是xxxx',
                                    blank=True)
 
