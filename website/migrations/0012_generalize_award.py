@@ -26,8 +26,9 @@ def rev_func(apps, schema_editor):
     """
     Publication = apps.get_model('website', 'Publication')
     for best_paper in Publication.objects.filter(awards__icontains=BEST_PAPER_STR):
-        best_paper.best_paper = True
-        best_paper.save()
+        if any(lambda a: a.strip().lower() == BEST_PAPER_STR.lower(), best_paper.awards.split(';')):
+            best_paper.best_paper = True
+            best_paper.save()
 
 class Migration(migrations.Migration):
 
