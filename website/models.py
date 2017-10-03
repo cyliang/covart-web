@@ -134,7 +134,8 @@ class Publication(models.Model):
     venue      = models.CharField(max_length=255, help_text='Ex: VEE')
     pages      = models.CharField(max_length=255, blank=True)
     dblp_key   = models.CharField(max_length=255, blank=True)
-    best_paper = models.BooleanField(default=False)
+    awards     = models.CharField(max_length=255, blank=True,
+                                  help_text='Separated with semicolon. Ex: Best paper award; Another award')
     hidden     = models.BooleanField(default=False,
                                      help_text='Check this if the paper is not that important.')
     author_members = models.ManyToManyField('Member')
@@ -144,6 +145,9 @@ class Publication(models.Model):
 
     def __unicode__(self):
         return self.title
+
+    def award_list(self):
+        return self.awards.split(';')
 
     @classmethod
     def get_from_keyword(cls, keyword):

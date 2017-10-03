@@ -15,9 +15,11 @@
                 {% if 'journal' in publication.paper_type|lower %}
                 <div class="ts negative label">Journal</div>
                 {% endif %}
-                {% if publication.best_paper %}
-                <div class="ts positive label">Best paper award</div>
+                {% for award in publication.award_list %}
+                {% if award %}
+                <div class="ts positive label">{{ award }}</div>
                 {% endif %}
+                {% endfor %}
             </div>
         </div>
         <div class="middle aligned actions">
