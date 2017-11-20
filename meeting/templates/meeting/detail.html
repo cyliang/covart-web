@@ -41,7 +41,7 @@
 
         <h4>Attendance Status</h4>
         {% with stat=object.get_attendance_statistics %}
-        <div class="ts inverted padded segment">
+        <div class="ts tablet or large device only inverted padded segment">
         <div class="ts fluid inverted statistics">
             {% if stat.present_rate > 99 %}
             <div class="positive statistic">
@@ -65,6 +65,18 @@
                 <div class="value">{{ stat.expected }}</div>
                 <div class="label">Expected</div>
             </div>
+        </div>
+        </div>
+        <div class="ts mobile only inverted segment">
+        {% if stat.present_rate > 99 %}
+        <div class="ts positive inverted horizontal statistic">
+        {% elif stat.present_rate > 80 %}
+        <div class="ts primary inverted horizontal statistic">
+        {% else %}
+        <div class="ts negative inverted horizontal statistic">
+        {% endif %}
+            <div class="value">{{ stat.present_rate }}%</div>
+            <div class="label">Attendance Rate</div>
         </div>
         </div>
         {% endwith %}

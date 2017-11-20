@@ -31,7 +31,7 @@
     <div class="ts container">
         <h3 class="ts dividing header">Lab Advisor</h3>
         <div class="ts selection items">
-            <a class="item" href="{{ professor.get_absolute_url }}">
+            <a class="tablet or large device only item" href="{{ professor.get_absolute_url }}">
                 <div class="ts circular small image">
                     <img src="{{ professor.get_picture_url }}">
                 </div>
@@ -39,7 +39,8 @@
                     <div class="header">Wei-Chung Hsu (徐慰中)</div>
                     <div class="meta">{{ professor.email }}</div>
                     <div class="description">
-                        Professor, Computer Science, National Taiwan University
+                        Professor and Associate Chairman,
+                        Computer Science, National Taiwan University
                     </div>
                 </div>
                 <div class="bottom aligned actions">
@@ -47,6 +48,19 @@
                 </div>
             </a>
         </div>
+        <a class="mobile only" href="{{ professor.get_absolute_url }}">
+            <div class="ts centered circular small image">
+                <img src="{{ professor.get_picture_url }}">
+            </div>
+            <div class="ts medium center aligned header">
+                Wei-Chung Hsu (徐慰中)
+                <div class="sub header" style="line-height: 150%; margin-top: 5px">
+                    Professor and Associate Chairman,<br>
+                    Computer Science, National Taiwan University
+                </div>
+            </div>
+            <div class="ts hidden divider"></div>
+        </a>
 
         <div class="ts stackable two column grid">
             <div class="column">

@@ -1,7 +1,11 @@
 <div class="ts segment">
-    <div class="ts grid">
-        <div class="column">
-            <div class="ts list">
+    <div class="ts reversed stackable grid">
+        <div class="three wide column">
+            <img class="ts centered rounded image" src="{{ member.get_picture_url }}">
+            <div class="ts mobile only divider"></div>
+        </div>
+        <div class="stretched column">
+            <div class="ts relaxed divided list">
                 <div class="item">
                     <i class="mail icon"></i>
                     <div class="content">
@@ -16,28 +20,21 @@
                         <div class="description">{{ member.join_date.year }}</div>
                     </div>
                 </div>
-                {% if member.graduate_date %}
-                <div class="item">
+                <div class="{% if not member.graduate_date %}disabled {% endif %}item">
                     <i class="graduation icon"></i>
                     <div class="content">
                         <div class="header">Graduated in</div>
-                        <div class="description">{{ member.graduate_date.year }}</div>
+                        <div class="description">{{ member.graduate_date.year }}&nbsp;</div>
                     </div>
                 </div>
-                {% endif %}
-                {% if member.thesis %}
-                <div class="item">
+                <div class="{% if not member.thesis %}disabled {% endif %}item">
                     <i class="book icon"></i>
                     <div class="content">
                         <div class="header">Thesis</div>
-                        <div class="description">{{ member.thesis }}</div>
+                        <div class="description">{{ member.thesis }}&nbsp;</div>
                     </div>
                 </div>
-                {% endif %}
             </div>
-        </div>
-        <div class="right floated column">
-            <img class="ts small rounded image" src="{{ member.get_picture_url }}">
         </div>
     </div>
 </div>
