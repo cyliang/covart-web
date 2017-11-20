@@ -28,10 +28,12 @@
                             </div>
                             <div class="content">
                                 <div class="header">{{ member.name }}</div>
-                                <div class="meta">{{ member.email }}</div>
+                                <div class="tablet or large device only meta">{{ member.email }}</div>
                             </div>
                             {% if member.identity != member.identity_choices.0.0 %}
-                            <div class="secondary extra content">Joined {{ member.join_date|timesince }} ago</div>
+                            <div class="tablet or large device only secondary extra content">
+                                Joined {{ member.join_date|timesince }} ago
+                            </div>
                             {% endif %}
                         </a>
                     {% endfor %}
