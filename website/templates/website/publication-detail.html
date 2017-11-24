@@ -14,9 +14,9 @@
             <div class="active section">{{ object.title }}</div>
         </div>
 
-        <h2 class="ts dividing header">{{ object.title }}
+        <h3 class="ts dividing header">{{ object.title }}
             <div class="sub header">{{ object.authors }}</div>
-        </h2>
+        </h3>
 
         {% if 'conf' in object.paper_type|lower %}
         <div class="ts large primary label">Conference</div>
@@ -30,16 +30,16 @@
         {% endif %}
         {% endfor %}
 
-        <h3>Venue</h3>
+        <h4>Venue</h4>
         {{ object.venue }} {{ object.year }}
 
         {% if object.abstract %}
-        <h3>Abstract</h3>
+        <h4>Abstract</h4>
         {{ object.abstract|linebreaks }}
         {% endif %}
 
         {% if object.author_members.exists %}
-        <h3>Author Links</h3>
+        <h4>Author Links</h4>
         <div class="ts doubling eight cards">
             {% for author in object.publicationauthor_set.all %}
             <a href="{{ author.author.get_absolute_url }}" class="ts raised card">
@@ -57,7 +57,7 @@
         </div>
         {% endif %}
 
-        <h3>External Links</h3>
+        <h4>External Links</h4>
         <div class="ts large horizontal list">
             {% if object.doi %}
             <a class="item" href="https://doi.org/{{ object.doi }}" target="_blank">
@@ -86,14 +86,14 @@
             </a>
         </div>
 
-        <h3>Cite This Paper</h3>
+        <h4>Cite This Paper</h4>
         <div class="ts segment">
             {{ object.authors }}:<br>
             <strong style="font-weight: bold">{{ object.title }}</strong>
             {{ object.venue }} {{ object.year }}
         </div>
         {% if object.dblp_key %}
-        <h5>BibTex</h5>
+        <h6>BibTex</h6>
         <a href="http://dblp.uni-trier.de/rec/bib2/{{ object.dblp_key }}.bib">
             Download BibTex (.bib)
         </a>
