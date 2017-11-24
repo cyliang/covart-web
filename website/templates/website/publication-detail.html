@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    [{{ object.venue }}'{{ object.year|stringformat:'d'|slice:'-2:' }}]
+    {{ object.title }}
+{% endblock %}
+
+{% block content %}
+    <div class="ts container">
+        <div class="ts breadcrumb">
+            <a class="section" href="{% url 'website:publications' %}">Publications</a>
+            <div class="divider"> / </div>
+            <div class="active section">{{ object.title }}</div>
+        </div>
+
+        <h2 class="ts dividing header">{{ object.title }}
+            <div class="sub header">{{ object.authors }}</div>
+        </h2>
+
+        {% if 'conf' in object.paper_type|lower %}
+        <div class="ts large primary label">Conference</div>
+        {% endif %}
+        {% if 'journal' in object.paper_type|lower %}
+        <div class="ts large negative label">Journal</div>
+        {% endif %}
+        {% for award in object.award_list %}
+        {% if award %}
+        <div class="ts large positive label">{{ award }}</div>
+        {% endif %}
+        {% endfor %}
+
+        <h3>Venue</h3>
+        {{ object.venue }} {{ object.year }}
+
+        {% if object.abstract %}
+        <h3>Abstract</h3>
+        {{ object.abstract|linebreaks }}
+        {% endif %}
+
+        {% if object.author_members.exists %}
+        <h3>Author Links</h3>
+        <div class="ts doubling eight cards">
+            {% for author in object.publicationauthor_set.all %}
+            <a href="{{ author.author.get_absolute_url }}" class="ts raised card">
+                <div class="image">
+                    <img src="{{ author.author.get_picture_url }}">
+                </div>
+                <div class="content">
+                    <div class="header">
+                        {{ author.order }}.
+                        {{ author.author.name }}
+                    </div>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <h3>External Links</h3>
+        <div class="ts large horizontal list">
+            {% if object.doi %}
+            <a class="item" href="https://doi.org/{{ object.doi }}" target="_blank">
+                <img class="ts rounded avatar image" src="{% static 'website/doi.png' %}">
+                <div class="content">
+                    <div class="header">Digital Library</div>
+                    <div class="description">Find with DOI</div>
+                </div>
+            </a>
+            {% endif %}
+            {% if object.dblp_key %}
+            <a class="item" href="http://dblp.org/rec/{{ object.dblp_key }}" target="_blank">
+                <img class="ts rounded avatar image" src="{% static 'website/dblp.png' %}">
+                <div class="content">
+                    <div class="header">DBLP</div>
+                    <div class="description">Find on DBLP</div>
+                </div>
+            </a>
+            {% endif %}
+            <a class="item" href="https://scholar.google.com/scholar?q={{ object.title|urlencode }}" target="_blank">
+                <img class="ts rounded avatar image" src="{% static 'website/google-scholar.png' %}">
+                <div class="content">
+                    <div class="header">Google Scholar</div>
+                    <div class="description">Search on Google Scholar</div>
+                </div>
+            </a>
+        </div>
+
+        <h3>Cite This Paper</h3>
+        <div class="ts segment">
+            {{ object.authors }}:<br>
+            <strong style="font-weight: bold">{{ object.title }}</strong>
+            {{ object.venue }} {{ object.year }}
+        </div>
+        {% if object.dblp_key %}
+        <h5>BibTex</h5>
+        <a href="http://dblp.uni-trier.de/rec/bib2/{{ object.dblp_key }}.bib">
+            Download BibTex (.bib)
+        </a>
+        {% endif %}
+    </div>
+{% endblock %}

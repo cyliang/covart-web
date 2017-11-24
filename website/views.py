@@ -118,6 +118,11 @@ class PublicationListView(ListView):
     template_name = 'website/publication-list.html'
 
 
+class PublicationDetailView(DetailView):
+    model = models.Publication
+    template_name = 'website/publication-detail.html'
+
+
 class PublicationImportView(UserPassesTestMixin, FormView):
     template_name = 'website/publication-import.html'
     form_class = forms.PublicationImportForm

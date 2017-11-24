@@ -134,17 +134,22 @@ class Publication(models.Model):
     venue      = models.CharField(max_length=255, help_text='Ex: VEE')
     pages      = models.CharField(max_length=255, blank=True)
     dblp_key   = models.CharField(max_length=255, blank=True)
+    doi        = models.CharField(max_length=100, blank=True, help_text='Ex: 10.1145/2892242.2892246')
+    abstract   = models.TextField(blank=True)
     awards     = models.CharField(max_length=255, blank=True,
                                   help_text='Separated with semicolon. Ex: Best paper award; Another award')
     hidden     = models.BooleanField(default=False,
                                      help_text='Check this if the paper is not that important.')
-    author_members = models.ManyToManyField('Member')
+    author_members = models.ManyToManyField('Member', through='PublicationAuthor')
 
     class Meta:
         ordering = ['-year']
 
     def __unicode__(self):
         return self.title
+
+    def get_absolute_url(self):
+        return reverse('website:publication-detail', args=[self.slug])
 
     def award_list(self):
         return self.awards.split(';')
@@ -178,6 +183,16 @@ class Publication(models.Model):
                 return obj
 
         return None
+
+
+class PublicationAuthor(models.Model):
+    publication = models.ForeignKey('Publication', on_delete=models.CASCADE)
+    author      = models.ForeignKey('Member', on_delete=models.CASCADE)
+    order       = models.PositiveSmallIntegerField()
+
+    class Meta:
+        unique_together = (('publication', 'author'), ('publication', 'order'))
+        ordering = ['order']
 
 
 class InternalLink(models.Model):
