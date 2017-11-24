@@ -66,6 +66,7 @@ class MemberDetailView(FilterMixin, SingleTableMixin, DetailView):
         # Special look for the advisor.
         if self.object.identity == self.model.ADVISOR:
             context['menu_attached'] = True
+            context['publications'] = models.Publication.objects.filter(hidden=False)[:5]
 
         filterset = self.get_filterset(self.get_filterset_class())
         MeetingAttendance = meeting_models.MeetingAttendance
