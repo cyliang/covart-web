@@ -33,7 +33,7 @@
                     <div class="column">
                     <a class="ts labeled icon left floated tiny basic positive button" href="{{ previous.get_absolute_url }}">
                         <i class="angle left icon"></i>
-                        {{ previous.title|truncatechars:20 }}
+                        {{ previous.title|truncatechars:16 }}
                     </a>
                     </div>
                     {% endif %}
@@ -41,7 +41,7 @@
                     <div class="right floated column">
                     <a class="ts right labeled icon right floated tiny basic positive button" href="{{ next.get_absolute_url }}">
                         <i class="angle right icon"></i>
-                        {{ next.title|truncatechars:20 }}
+                        {{ next.title|truncatechars:16 }}
                     </a>
                     </div>
                     {% endif %}
