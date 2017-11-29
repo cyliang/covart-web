@@ -8,7 +8,11 @@
     <meta name="author" content="Chih-Yung Liang">
     <meta name="description" content="Laboratory led by prof. Wei-Chung Hsu for Compiler Optimization, Virtualization, and Adaptive Runtime">
 
-    <title>Covart Lab - {% block title %}Compiler Optimization, Virtualization, and Adaptive Runtime{% endblock %}</title>
+    <title>
+        {% block full_title %}
+        Covart Lab - {% block title %}Compiler Optimization, Virtualization, and Adaptive Runtime{% endblock %}
+        {% endblock %}
+    </title>
 
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/tocas-ui/2.3.2/tocas.css">
 </head>
