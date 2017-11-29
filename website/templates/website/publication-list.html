@@ -9,14 +9,6 @@
     <div class="ts container">
         <h2 class="ts dividing header">Publications</h2>
 
-        {% if user.is_staff %}
-        <div class="ts grid">
-            <div class="right floated column">
-                <a class="ts right floated primary small button" href="{% url 'website:publication-import' %}">Import</a>
-            </div>
-        </div>
-        {% endif %}
-
         {% regroup object_list by year as pub_years %}
         {% for pub_year in pub_years %}
             <h3>{{ pub_year.grouper }}</h3>
