@@ -192,7 +192,7 @@ class PresentHistory(models.Model):
     DEFAULT_TYPE = PROGRESS_REPORT
 
     presenter    = models.ForeignKey('website.Member', models.SET_NULL, null=True)
-    meeting      = models.ForeignKey('MeetingHistory', models.SET_NULL, null=True)
+    meeting      = models.ForeignKey('MeetingHistory', models.PROTECT)
     present_type = models.CharField(max_length=10, choices=type_choices)
     content      = models.TextField(blank=True)
     is_specially_arranged = models.BooleanField(default=False)
