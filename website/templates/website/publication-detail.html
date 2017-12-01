@@ -51,6 +51,10 @@
                         {{ author.order }}.
                         {{ author.author.name }}
                     </div>
+                    <div class="meta">
+                        {{ author.author.get_identity_display }}
+                        {% if author.author.identity in author.author.students %}student{% endif %}
+                    </div>
                 </div>
             </a>
             {% endfor %}
