@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 """
 Django settings for covart project.
 
@@ -155,7 +156,12 @@ STATIC_URL = '/static/'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media/')
 
+from datetime import time, timedelta
+
 MEETING_DAY = 0 # 0 for Monday
+MEETING_START_TIME = time(10)
+MEETING_DURATION = timedelta(hours=2)
+MEETING_LOCATION = '德田館440室'
 DJANGO_TABLES2_TEMPLATE = 'table-base.html'
 
 DEFAULT_FROM_EMAIL = 'Lab404 <covart.csie.org@gmail.com>'
