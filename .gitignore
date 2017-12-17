@@ -55,6 +55,7 @@ coverage.xml
 local_settings.py
 /static/
 media/
+service_secret.json
 
 # Flask stuff:
 instance/
