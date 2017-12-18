@@ -110,6 +110,7 @@ def sync_meeting_with_gcal(meeting):
 
     calendar = google.get('calendar', 'v3')
 
+    del meeting.gcal_id
     if meeting.gcal_id != "":
         try:
             event = calendar.events().update(
