@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load static %}
 
 {% block title %}Login{% endblock %}
 
@@ -67,9 +68,8 @@
             <div class="ts header">
                 With Social Network
             </div>
-            <a class="ts labeled icon positive basic fluid button" href="{% url 'social:begin' 'google-oauth2' %}?{{ request.GET.urlencode }}">
-                <i class="google icon"></i>
-                Login with Google
+            <a href="{% url 'social:begin' 'google-oauth2' %}?{{ request.GET.urlencode }}">
+                <img src="{% static 'website/google-signin.png' %}" srcset="{% static 'website/google-signin.png' %} 1x, {% static 'website/google-signin@2x.png' %} 2x" />
             </a>
         </div>
         </div>
