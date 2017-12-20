@@ -170,6 +170,7 @@ class MeetingHistory(models.Model):
         related_name='attending',
     )
     gcal_id       = models.CharField(max_length=150, blank=True)
+    slack_ts      = models.CharField(max_length=150, blank=True)
 
     class Meta:
         ordering = ['-date']

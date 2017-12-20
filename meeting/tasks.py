@@ -1,7 +1,8 @@
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
 from django.conf import settings
-from . import models
+from django_q.tasks import async
+from . import models, slack
 from datetime import timedelta, date
 
 def weekly_update():
@@ -73,6 +74,9 @@ def meeting_notification():
         subject = postponed_date.strftime('Group Meeting Postponed (%m/%d)')
         ret = 'Meeting postponing message sent'
     else:
+        # Notify with Slack
+        async(slack.send_meeting_notification, next_meeting)
+
         template_name = 'meeting/notify_email'
         subject = next_meeting.get_email_title()
         ret = 'Meeting notification for %s sent.' % unicode(next_meeting)
@@ -85,4 +89,5 @@ def meeting_notification():
         body=text_body,
         html_body=html_body,
     )
+
     return ret
