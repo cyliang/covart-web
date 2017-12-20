@@ -127,6 +127,7 @@ USE_TZ = True
 # Social Login
 AUTHENTICATION_BACKENDS = (
     'social_core.backends.google.GoogleOAuth2',
+    'social_core.backends.slack.SlackOAuth2',
     'django.contrib.auth.backends.ModelBackend',
 )
 # Fix MySQL bugs

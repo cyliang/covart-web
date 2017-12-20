@@ -68,6 +68,9 @@
             <div class="ts header">
                 With Social Network
             </div>
+            <a href="{% url 'social:begin' 'slack' %}?{{ request.GET.urlencode }}">
+                <img src="{% static 'website/slack-signin.png' %}" srcset="{% static 'website/slack-signin.png' %} 1x, {% static 'website/slack-signin@2x.png' %} 2x" />
+            </a>
             <a href="{% url 'social:begin' 'google-oauth2' %}?{{ request.GET.urlencode }}">
                 <img src="{% static 'website/google-signin.png' %}" srcset="{% static 'website/google-signin.png' %} 1x, {% static 'website/google-signin@2x.png' %} 2x" />
             </a>
