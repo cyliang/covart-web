@@ -1,14 +1,40 @@
-from django.core.mail import EmailMultiAlternatives
-from django.template.loader import render_to_string
 from django.conf import settings
 from django_q.tasks import async
-from . import models, slack
 from datetime import timedelta, date
+from . import models
+
+def sync_meeting_with_gcal(meeting):
+    try:
+        meeting = models.MeetingHistory.objects.get(pk=meeting.pk)
+    except models.MeetingHistory.DoesNotExist:
+        return "Meeting %s is already deleted" % unicode(meeting)
+
+    from .integrations.google import GoogleCalendar
+    return GoogleCalendar().sync_meeting(meeting)
+
+def delete_gcal_event(event_id):
+    from .integrations.google import GoogleCalendar
+    return GoogleCalendar().delete_event(event_id)
+
+def sync_meeting_with_slack(meeting):
+    try:
+        meeting = models.MeetingHistory.objects.get(pk=meeting.pk)
+    except models.MeetingHistory.DoesNotExist:
+        return "Meeting %s is already deleted" % unicode(meeting)
+
+    from .integrations.slack import Slack
+    return Slack().meeting_update(meeting)
+
+def delete_slack_msg(ts):
+    from .integrations.slack import Slack
+    return Slack().delete_message(ts)
 
 def weekly_update():
     models.MeetingHistory.rotate_next_meeting()
 
 def send_notification(body, recipients=None, subject=None, meeting=None, html_body=None):
+    from django.core.mail import EmailMultiAlternatives
+
     if not subject and not meeting:
         raise ValueError('There must be the argument "meeting" if the argument "subject" is missing.')
 
@@ -26,6 +52,7 @@ def rollcall_notification():
     """
     This task send a rollcall notification to each presenter.
     """
+    from django.template.loader import render_to_string
 
     try:
         meeting = models.MeetingHistory.objects.get(date=date.today())
@@ -51,6 +78,8 @@ def rollcall_notification():
     )
 
 def meeting_notification():
+    from django.template.loader import render_to_string
+
     next_meeting = models.MeetingHistory.objects.all()[:1][0]
 
     data = {
@@ -75,7 +104,7 @@ def meeting_notification():
         ret = 'Meeting postponing message sent'
     else:
         # Notify with Slack
-        async(slack.send_meeting_notification, next_meeting)
+        async(sync_meeting_with_slack, next_meeting)
 
         template_name = 'meeting/notify_email'
         subject = next_meeting.get_email_title()

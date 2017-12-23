@@ -3,6 +3,8 @@ from __future__ import unicode_literals
 from django.db import models
 from django.conf import settings
 from django.urls import reverse
+from django.db.models import signals
+from django.dispatch import receiver
 from datetime import date, timedelta, datetime
 from django_q.tasks import async
 
@@ -55,101 +57,6 @@ class PresentRotation(models.Model):
             return manager.all().order_by('order')[0]
 
 
-def sync_meeting_with_gcal(meeting):
-    from . import google
-    from django.utils.timezone import make_aware, get_default_timezone_name
-    from django.utils.text import get_text_list
-    from django.db.models import Q
-    from googleapiclient.errors import HttpError
-
-    if not hasattr(settings, 'GOOGLE_CALENDAR_ID'):
-        print "Set GOOGLE_CALENDAR_ID in settings to sync with Google Calendar"
-        return "Sync aborted due to improper settings"
-
-    # Get meeting time with timezone
-    start = make_aware(datetime.combine(meeting.date, settings.MEETING_START_TIME))
-    end = start + settings.MEETING_DURATION
-    timezone = get_default_timezone_name()
-
-    # Add present content as event description
-    description = 'Presenters are %s.\n\n' % get_text_list(
-        map(unicode, meeting.presenters.all()), 'and'
-    ) + '\n\n'.join([
-        '%s: %s' % (p.presenter, p.content)
-        for p in meeting.presenthistory_set.all()
-    ])
-
-    attendees = [
-        {
-            'email': a.member.get_internal_email(),
-            'displayName': a.member.name,
-            'responseStatus': 'accepted' if a.get_is_present() else 'declined',
-        }
-        for a in meeting.meetingattendance_set.all()
-        if a.member.get_internal_email() != None
-    ]
-
-    body = {
-        'summary': 'Group Meeting',
-        'location': settings.MEETING_LOCATION,
-        'description': description,
-        'start': {
-            'dateTime': start.isoformat(),
-            'timeZone': timezone,
-        },
-        'end': {
-            'dateTime': end.isoformat(),
-            'timeZone': timezone,
-        },
-        'source': {
-            'title': unicode(meeting),
-            'url': settings.BASE_URL + meeting.get_absolute_url()
-        },
-        'attendees': attendees,
-    }
-
-    calendar = google.get('calendar', 'v3')
-
-    del meeting.gcal_id
-    if meeting.gcal_id != "":
-        try:
-            event = calendar.events().update(
-                calendarId=settings.GOOGLE_CALENDAR_ID,
-                eventId=meeting.gcal_id,
-                body=body,
-            ).execute()
-
-            return "Meeting event updated."
-        except HttpError as e:
-            # The calendar event may be accidentally deleted.
-            if e.resp != 404:
-                raise e
-
-    event = calendar.events().insert(
-        calendarId=settings.GOOGLE_CALENDAR_ID,
-        body=body,
-    ).execute()
-
-    meeting.gcal_id = event['id']
-    meeting.save_without_sync()
-    return "Meeting event created: %s" % event.get('htmlLink', '')
-
-def delete_gcal_event(event_id):
-    from . import google
-    from googleapiclient.errors import HttpError
-
-    try:
-        google.get('calendar', 'v3').events().delete(
-            calendarId=settings.GOOGLE_CALENDAR_ID,
-            eventId=event_id,
-        ).execute()
-    except HttpError as e:
-        # The calendar event may be accidentally deleted.
-        if e.resp != 404:
-            raise e
-
-    return 'Event deleted successfully.'
-
 class MeetingHistory(models.Model):
     """
     The history for past meetings and one coming meeting.
@@ -187,15 +94,25 @@ class MeetingHistory(models.Model):
         """
 
         ret = super(MeetingHistory, self).save(*args, **kwargs)
-        async(sync_meeting_with_gcal, self)
+        self.post_save()
         return ret
 
     def save_without_sync(self, *args, **kwargs):
         return super(MeetingHistory, self).save(*args, **kwargs)
 
+    def post_save(self):
+        # Sync with GoogleCalendar
+        async('meeting.tasks.sync_meeting_with_gcal', self)
+
+        # Sync with Slack
+        if self.slack_ts != '':
+            async('meeting.tasks.sync_meeting_with_slack', self)
+
     def delete(self, *args, **kwargs):
         if self.gcal_id != '':
-            async(delete_gcal_event, self.gcal_id)
+            async('meeting.tasks.delete_gcal_event', self.gcal_id)
+        if self.slack_ts != '':
+            async('meeting.tasks.delete_slack_msg', self.slack_ts)
         return super(MeetingHistory, self).delete(*args, **kwargs)
 
     def not_yet_happened(self):
@@ -286,6 +203,16 @@ class MeetingHistory(models.Model):
 
         return next_meeting
 
+@receiver([signals.post_save, signals.post_delete], dispatch_uid='sync_meeting')
+def sync_meeting(sender, instance, **kwargs):
+    """
+    Sync meeting with third party integrations (e.g. Google Calendar and Slack)
+    whenever an entry related to a meeting is modified.
+    """
+    meeting = getattr(instance, 'meeting', None)
+    if isinstance(meeting, MeetingHistory):
+        meeting.post_save()
+
 
 class MeetingSkip(models.Model):
     date   = models.DateField()
@@ -324,16 +251,6 @@ class PresentHistory(models.Model):
             meeting,
             self.get_present_type_display()
         )
-
-    def save(self, *args, **kwargs):
-        ret = super(PresentHistory, self).save(*args, **kwargs)
-        async(sync_meeting_with_gcal, self.meeting)
-        return ret
-
-    def delete(self, *args, **kwargs):
-        ret = super(PresentHistory, self).delete(*args, **kwargs)
-        async(sync_meeting_with_gcal, self.meeting)
-        return ret
 
     @property
     def another_type(self):
@@ -383,16 +300,6 @@ class MeetingAttendance(models.Model):
 
     class Meta:
         unique_together = ('meeting', 'member')
-
-    def save(self, *args, **kwargs):
-        ret = super(MeetingAttendance, self).save(*args, **kwargs)
-        async(sync_meeting_with_gcal, self.meeting)
-        return ret
-
-    def delete(self, *args, **kwargs):
-        ret = super(MeetingAttendance, self).delete(*args, **kwargs)
-        async(sync_meeting_with_gcal, self.meeting)
-        return ret
 
     def get_is_present(self):
         return self.status in (self.PRESENT_ON_TIME, self.LATE)
