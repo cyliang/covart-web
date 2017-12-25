@@ -2,6 +2,7 @@ from django.conf import settings
 from django.core.exceptions import ImproperlyConfigured
 from django.urls import reverse
 from django.contrib.staticfiles.templatetags.staticfiles import static
+from django.utils.text import get_text_list
 from slackclient.client import SlackClient
 
 def _url(url):
@@ -53,6 +54,41 @@ class Slack(object):
             except Exception:
                 pass
 
+        # Attendees
+        attendees = meeting.meetingattendance_set
+        ontime = attendees.filter(status=attendees.model.PRESENT_ON_TIME)
+        late = attendees.filter(status=attendees.model.LATE)
+        absent = filter(lambda a: not a.get_is_present(), attendees.all())
+        attend_fields = [{
+            "title": "On Time",
+            "value": get_text_list(
+                list(ontime.values_list('member__name', flat=True)),
+                "and"
+            ),
+        }]
+        if late.exists():
+            attend_fields += [{
+                "title": "Late",
+                "value": get_text_list(
+                    list(late.values_list('member__name', flat=True)),
+                    "and"
+                ),
+                "short": True,
+            }]
+        if len(absent) > 0:
+            attend_fields += [{
+                "title": "Leave / Absent",
+                "value": get_text_list(
+                    [a.member.name for a in absent],
+                    "and"
+                ),
+                "short": True,
+            }]
+        attachments += [{
+            "fallback": "",
+            "fields": attend_fields,
+        }]
+
         # Button Actions
         attachments += [{
             "fallback": "Go %s for detail." % _url(meeting.get_absolute_url()),
@@ -91,6 +127,31 @@ class Slack(object):
             resp = self("chat.update", ts=meeting.slack_ts, **req)
 
         return unicode(resp)
+
+    def send_postponed(self, meeting, postponed_date, reason):
+        text = "There will be *no* group meeting next week (%A, %b %d, %Y)"
+        text = postponed_date.strftime(text) + ("%s.\n" % reason.lower())
+        text += "The next group meeting has been postponed to "
+        text += meeting.date.strftime("%A, %b %d, %Y. ")
+        text += "Presenters will be %s." % get_text_list(
+            map(unicode, meeting.presenters.all()), 'and'
+        )
+
+        attachments = [{
+            "fallback": "Go %s for detail." % _url(meeting.get_absolute_url()),
+            "actions": [{
+                "type": "button",
+                "text": "Detail",
+                "url": _url(meeting.get_absolute_url()),
+            }]
+        }]
+
+        return unicode(self("chat.postMessage",
+            text=text,
+            attachments=attachments,
+            icon_url=_url(static('slack/presentation.png')),
+            username='Meeting Bot',
+        ))
 
     def delete_message(self, ts):
         return self("chat.delete", ts=ts)

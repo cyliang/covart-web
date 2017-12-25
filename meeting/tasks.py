@@ -29,6 +29,10 @@ def delete_slack_msg(ts):
     from .integrations.slack import Slack
     return Slack().delete_message(ts)
 
+def send_slack_postponed_meeting(meeting, postponed_date, reason):
+    from .integrations.slack import Slack
+    return Slack().send_postponed(meeting, postponed_date, reason)
+
 def weekly_update():
     models.MeetingHistory.rotate_next_meeting()
 
@@ -98,6 +102,9 @@ def meeting_notification():
 
         data['postponed_date'] = postponed_date
         data['reason'] = reason
+
+        # Notify with Slack
+        async(send_slack_postponed_meeting, next_meeting, postponed_date, reason)
 
         template_name = 'meeting/postpone_email'
         subject = postponed_date.strftime('Group Meeting Postponed (%m/%d)')
