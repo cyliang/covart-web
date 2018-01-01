@@ -3,6 +3,8 @@ from django.views.generic import DetailView, UpdateView, TemplateView
 from django.urls import reverse
 from django.db.models import ExpressionWrapper, CharField, Value as V, F, Max, Case, When, Sum, IntegerField
 from django.db.models.functions import Concat
+from django.dispatch import receiver
+from django.http import JsonResponse
 from django.forms import widgets, modelformset_factory
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -13,6 +15,7 @@ from django_q.tasks import async
 from datetime import timedelta, date
 from . import tables, models, forms, filters
 from website import models as website_models
+from integrations.slack.signals import slack_request
 
 class ScheduleView(SingleTableView):
     """
@@ -301,3 +304,13 @@ class AttendanceStatView(LoginRequiredMixin, TemplateView):
             })
 
         return context
+
+
+@receiver(slack_request)
+def slack_test_view(signal, sender, **kwargs):
+    print kwargs['payload']
+    return JsonResponse({
+        "response_type": "ephemeral",
+        "replace_original": False,
+        "text": "Sorry, we didn't implement any response yet.",
+    })
