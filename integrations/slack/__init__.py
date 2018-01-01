@@ -4,11 +4,12 @@ from slackclient.client import SlackClient
 
 class Slack(object):
 
-    def __init__(self, channel, token=None):
+    def __init__(self, channel=None, token=None):
         token = token or getattr(settings, 'SLACK_TOKEN', None)
-        self.channel = channel
+        if channel:
+            self.channel = channel
 
-        if token == None or self.channel == None:
+        if token == None:
             raise ImproperlyConfigured("Set SLACK_TOKEN in your setting.")
 
         self._client = SlackClient(token)
@@ -17,7 +18,8 @@ class Slack(object):
         """
         Call SlackClient API with default channel set and error checking.
         """
-        kwargs.setdefault('channel', self.channel)
+        if hasattr(self, 'channel'):
+            kwargs.setdefault('channel', self.channel)
         resp = self._client.api_call(method, *args, **kwargs)
         if not resp['ok']:
             print unicode(resp)
