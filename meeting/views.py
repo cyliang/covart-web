@@ -10,6 +10,7 @@ from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.core.mail import EmailMultiAlternatives
 from django.template.loader import render_to_string
+from django.contrib.staticfiles.templatetags.staticfiles import static
 from django_tables2 import SingleTableView
 from django_q.tasks import async
 from datetime import timedelta, date
@@ -305,6 +306,9 @@ class AttendanceStatView(LoginRequiredMixin, TemplateView):
         return context
 
 
+def _url(url):
+    return settings.BASE_URL + url
+
 def slack_meeting_receiver(fn):
     from integrations.slack.signals import slack_request
     from integrations.slack.views import SimpleTextResponse
@@ -343,19 +347,19 @@ def slack_take_leave(meeting, action, payload, request, **kwargs):
     if action != 'take-leave':
         return
 
+    from integrations.slack.views import SimpleTextResponse
+    from integrations.slack import Slack
+    from django.http import HttpResponse
+
     try:
         record = models.MeetingAttendance.objects.get(
             meeting=meeting,
             member=request.user.member,
         )
     except models.MeetingAttendance.DoesNotExist:
-        from integrations.slack.views import SimpleTextResponse
         return SimpleTextResponse(
             "Sorry, I cannot find your attendance record. " +
             "Maybe you are not expected to present in this meeting?")
-
-    from integrations.slack import Slack
-    from django.http import HttpResponse
 
     view = TakeLeaveView(request=request, args=[], kwargs={}, object=record)
 
@@ -411,6 +415,42 @@ def slack_take_leave(meeting, action, payload, request, **kwargs):
 
         if form.is_valid():
             view.form_valid(form)
+            record = view.object
+
+            async('meeting.tasks.run_slack', 'chat.postEphemeral',
+                channel=settings.SLACK_MEETING_CHANNEL,
+                icon_url=_url(static('slack/presentation.png')),
+                username='Meeting Bot',
+                text="OK, I've confirmed your request to take leave on %s." % (
+                    unicode(meeting.date)),
+                user=payload['user']['id'],
+                attachments=[
+                    {
+                        'pretext': "Here are your submission detail",
+                        'fallback': record.reason,
+                        'author_name': record.member.name,
+                        'author_icon': _url(record.member.get_picture_url()),
+                        'fields': [
+                            {
+                                'title': "Meeting",
+                                'value': unicode(meeting),
+                                'short': True,
+                            },
+                            {
+                                'title': "Attendance Status",
+                                'value': record.get_status_display(),
+                                'short': True,
+                            },
+                            {
+                                'title': "Reason",
+                                'value': record.reason,
+                                'short': False,
+                            },
+                        ],
+                    },
+                ],
+            )
+
             return HttpResponse()
         else:
             # This shall never happen.
