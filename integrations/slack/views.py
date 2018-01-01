@@ -6,6 +6,13 @@ from django.views.decorators import http as http_decorators, csrf as csrf_decora
 from . import signals
 import json
 
+def SimpleTextResponse(text):
+    return http.JsonResponse({
+        'response_type': 'ephemeral',
+        'replace_original': False,
+        'text': text,
+    })
+
 def slack_interaction(verification_token=None):
     token = verification_token or getattr(settings, 'SLACK_VERIFY_TOKEN', None)
     if token == None:
@@ -18,7 +25,6 @@ def slack_interaction(verification_token=None):
             payload = json.loads(request.POST['payload'])
             token = payload['token']
             callback_id = payload['callback_id']
-            actions = payload['actions']
         except KeyError, ValueError:
             return http.HttpResponseBadRequest("Can't deserialize the payload.")
 
@@ -29,15 +35,9 @@ def slack_interaction(verification_token=None):
         signal = signals.slack_request
         sender = None
 
-        if not signal.receivers or signal.sender_receivers_cache.get(sender) is NO_RECEIVERS:
-            return http.HttpResponseNotFound(
-                'This application is not ready to take any request.'
-            )
-
         for receiver in signal._live_receivers(sender):
             response = receiver(signal=signal, sender=sender,
                 callback_id=callback_id,
-                actions=actions,
                 payload=payload,
                 request=request,
             )
@@ -45,7 +45,8 @@ def slack_interaction(verification_token=None):
             if isinstance(response, http.HttpResponse):
                 return response
 
-        return http.HttpResponseNotFound("Nobody handles your request, sorry.")
+        return SimpleTextResponse(
+            'Sorry, this action is currently not implemented yet.')
 
     view.verification_token = token
     return view

@@ -15,7 +15,6 @@ from django_q.tasks import async
 from datetime import timedelta, date
 from . import tables, models, forms, filters
 from website import models as website_models
-from integrations.slack.signals import slack_request
 
 class ScheduleView(SingleTableView):
     """
@@ -306,11 +305,113 @@ class AttendanceStatView(LoginRequiredMixin, TemplateView):
         return context
 
 
-@receiver(slack_request)
-def slack_test_view(signal, sender, **kwargs):
-    print kwargs['payload']
-    return JsonResponse({
-        "response_type": "ephemeral",
-        "replace_original": False,
-        "text": "Sorry, we didn't implement any response yet.",
-    })
+def slack_meeting_receiver(fn):
+    from integrations.slack.signals import slack_request
+    from integrations.slack.views import SimpleTextResponse
+    from social_django.models import UserSocialAuth
+
+    @receiver(slack_request)
+    def recv(signal, sender, **kwargs):
+        if kwargs['callback_id'][:8] != 'meeting_':
+            return
+
+        _, slug, action = kwargs['callback_id'].split('_')
+
+        try:
+            meeting = models.MeetingHistory.objects.get(date=slug)
+        except models.MeetingHistory.DoesNotExist:
+            return SimpleTextResponse(
+                    "Sorry, I cannot find this meeting record." +
+                    "Maybe something went wrong. :(")
+
+        slack_user = UserSocialAuth.get_social_auth(
+            provider='slack',
+            uid=kwargs['payload']['user']['id'],
+        )
+        if slack_user == None:
+            return SimpleTextResponse(
+                "Sorry, I cannot verify your identity.\n" +
+                "Make sure you have an account on " + settings.BASE_URL)
+
+        kwargs['request'].user = slack_user.user
+        return fn(meeting=meeting, action=action, **kwargs)
+
+    return recv
+
+@slack_meeting_receiver
+def slack_take_leave(meeting, action, payload, request, **kwargs):
+    if action != 'take-leave':
+        return
+
+    try:
+        record = models.MeetingAttendance.objects.get(
+            meeting=meeting,
+            member=request.user.member,
+        )
+    except models.MeetingAttendance.DoesNotExist:
+        from integrations.slack.views import SimpleTextResponse
+        return SimpleTextResponse(
+            "Sorry, I cannot find your attendance record. " +
+            "Maybe you are not expected to present in this meeting?")
+
+    from integrations.slack import Slack
+    from django.http import HttpResponse
+
+    view = TakeLeaveView(request=request, args=[], kwargs={}, object=record)
+
+    if 'actions' in payload and payload['actions'][0]['value'] == 'open-modal':
+        # Emulate the GET behavior of the original website
+        request.method = 'GET'
+        form = view.get_form()
+
+        slack = Slack()
+        slack('dialog.open', trigger_id=payload['trigger_id'], dialog={
+            'callback_id': kwargs['callback_id'],
+            'title': meeting.date.strftime('Take Leave (%m/%d)'),
+            'submit_label': 'Request',
+            'elements': [
+                {
+                    'label': form['reason'].label,
+                    'name': form['reason'].html_name,
+                    'type': 'textarea',
+                    'max_length': 500,
+                    'min_length': 1,
+                    'hint': ("You should have requested a leave to " +
+                             "the advisor before filling this form to " +
+                             "finish the process to take leave."),
+                    'placeholder': "Describe your reason in detail",
+                    'value': form['reason'].value(),
+                },
+                {
+                    'label': 'Email Notification',
+                    'name': form['email_notification'].html_name,
+                    'type': 'select',
+                    'placeholder': "Send a notification to everyone",
+                    'options': [
+                        {
+                            'label': "Yes, send it.",
+                            'value': 'true',
+                        },
+                        {
+                            'label': "No, don't notify.",
+                            'value': 'false',
+                        },
+                    ],
+                },
+            ],
+        })
+
+        return HttpResponse()
+
+    elif payload.get('type', None) == 'dialog_submission':
+        # Emulate a form submission through POST method.
+        request.POST = payload['submission']
+        request.method = 'POST'
+        form = view.get_form()
+
+        if form.is_valid():
+            view.form_valid(form)
+            return HttpResponse()
+        else:
+            # This shall never happen.
+            raise RuntimeError("Forget it")
