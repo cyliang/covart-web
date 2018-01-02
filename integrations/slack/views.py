@@ -37,10 +37,13 @@ class SlackRequestDispatcher(object):
                 return http.HttpResponseForbidden(
                     "I cannot verify your token.")
 
-            handler = view.dispatcher_cls(**initargs).dispatch(callback_id)
+            handler = view.dispatcher_cls(**initargs).dispatch(payload)
             if handler == None:
                 return SimpleTextResponse(
                     'Sorry, this action is currently not implemented yet.')
+
+            # Reload it because dispatcher may modify it.
+            callback_id = payload['callback_id']
 
             handler.request = request
             handler.payload = payload
@@ -51,12 +54,15 @@ class SlackRequestDispatcher(object):
         view.dispatcher_cls = cls
         return view
 
-    def dispatch(self, callback_id):
+    def dispatch(self, payload):
         """
         Derived class shall override this method to determine a handler, which
-        is a SlackRequestHandler, for the specified callback_id.
+        is a SlackRequestHandler, for the specified callback_id and payload.
+
         This method shall return a instance of subclass of SlackRequestHandler
         to handle the request, or return None to reject the request.
+
+        This method is also allowed to modify the content of payload.
         """
         raise NotImplementedError(
             "Implement dispatch() to handle the request from Slack")

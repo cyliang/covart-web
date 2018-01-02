@@ -94,13 +94,20 @@ def sync_meeting_with_slack(meeting):
     # Button Actions
     attachments += [{
         "fallback": "Go %s for detail." % _url(meeting.get_absolute_url()),
-        "callback_id": "meeting_%s_take-leave" % unicode(meeting.date),
+        "callback_id": "meeting_%s_" % unicode(meeting.date),
         "actions": [
             {
                 "type": "button",
                 "text": "Detail",
                 "url": _url(meeting.get_absolute_url()),
-                },
+            },
+            {
+                "type": "button",
+                "text": "Edit Presentation",
+                "name": "present-update",
+                "value": "open-modal",
+                "style": "primary",
+            },
             {
                 "type": "button",
                 "text": "Take Leave",

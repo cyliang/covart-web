@@ -313,11 +313,14 @@ def _url(url):
 
 class SlackMeetingDispatcher(slack_views.SlackRequestDispatcher):
 
-    def dispatch(self, callback_id):
-        if callback_id[:8] != 'meeting_':
+    def dispatch(self, payload):
+        if payload['callback_id'][:8] != 'meeting_':
             return
 
-        _, slug, action = callback_id.split('_')
+        _, slug, action = payload['callback_id'].split('_')
+        if action == "":
+            action = payload['actions'][0]['name']
+            payload['callback_id'] += action
 
         try:
             meeting = models.MeetingHistory.objects.get(date=slug)
@@ -328,6 +331,8 @@ class SlackMeetingDispatcher(slack_views.SlackRequestDispatcher):
 
         if action == 'take-leave':
             return SlackTakeLeaveHandler(meeting)
+        if action == 'present-update':
+            return SlackPresentUpdateHandler(meeting)
         return None
 
 
@@ -336,6 +341,38 @@ class SlackMeetingHandler(slack_views.SlackAccessMixin, slack_views.SlackRequest
     def __init__(self, meeting, *args, **kwargs):
         self.meeting = meeting
         super(SlackMeetingHandler, self).__init__(*args, **kwargs)
+
+
+class SlackPresentUpdateHandler(slack_views.SlackUpdateMixin,
+                                SlackMeetingHandler, PresentUpdateView):
+    submit_label = "Update"
+
+    def get_object(self):
+        return self.model.objects.get(
+            meeting=self.meeting,
+            presenter=self.user.member,
+        )
+
+    def get_dialog_title(self):
+        return self.meeting.date.strftime('Update Content (%m/%d)')
+
+    def action(self, *args, **kwargs):
+        try:
+            return super(SlackPresentUpdateHandler, self).action(*args, **kwargs)
+        except self.model.DoesNotExist:
+            return SimpleTextResponse(
+                "Sorry, only presenters of this meeting can update their own " +
+                "contents.")
+
+    def form_valid(self, form):
+        super(SlackPresentUpdateHandler, self).form_valid(form)
+
+        async('meeting.tasks.run_slack', 'chat.postEphemeral',
+            channel=settings.SLACK_MEETING_CHANNEL,
+            text="OK, I've updated your presentation content for %s." % (
+                unicode(self.meeting.date)),
+            user=self.payload['user']['id'],
+        )
 
 
 class SlackTakeLeaveHandler(slack_views.SlackUpdateMixin,
@@ -403,7 +440,7 @@ class SlackTakeLeaveHandler(slack_views.SlackUpdateMixin,
     def action(self, *args, **kwargs):
         try:
             return super(SlackTakeLeaveHandler, self).action(*args, **kwargs)
-        except models.MeetingAttendance.DoesNotExist:
+        except self.model.DoesNotExist:
             return SimpleTextResponse(
                 "Sorry, I cannot find your attendance record. " +
                 "Maybe you are not expected to present in this meeting?")
