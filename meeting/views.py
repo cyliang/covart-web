@@ -352,6 +352,19 @@ class SlackTakeLeaveHandler(slack_views.SlackUpdateMixin,
     def get_dialog_title(self):
         return self.meeting.date.strftime('Take Leave (%m/%d)')
 
+    def get_extra_attrs_for_fields(self):
+        return {
+            'reason': {
+                'hint': ("You should have requested a leave to the advisor " +
+                        "before filling this form to finish the process to " +
+                        "take leave."),
+                'placeholder': "Describe your reason in detail",
+            },
+            'email_notification': {
+                'placeholder': "Send a notification to everyone",
+            },
+        }
+
     def form_valid(self, form):
         super(SlackTakeLeaveHandler, self).form_valid(form)
 

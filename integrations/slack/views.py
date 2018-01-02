@@ -229,12 +229,30 @@ class SlackFormMixin(object):
                 "than one word. Only 24 characters and single word are allowed")
         return self.submit_label
 
+    def get_extra_attrs_for_fields(self):
+        """
+        If you want to improve the look of the Slack dialog, you can specify
+        additional attributes for each form field in this method.
+
+        For example, you can return:
+        {
+            'field_name_1': {
+                'placeholder': "This is field 1",
+            },
+            'field_name_2': {
+                'hint': "This is field 2",
+            },
+        }
+        """
+        return {}
+
     def get_form_fields(self):
         form = self.get_form()
         if len(form.fields) > 5:
             raise ValueError(
                 "The form contains more than 5 fields and this is not " +
                 "allowed by Slack's dialog")
+        extra_attrs = self.get_extra_attrs_for_fields()
 
         for field in form:
             element = {
@@ -292,6 +310,7 @@ class SlackFormMixin(object):
             else:
                 raise ValueError("Field is currently not supported.")
 
+            element.update(extra_attrs.get(field.name, {}))
             yield element
 
 
