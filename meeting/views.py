@@ -338,7 +338,10 @@ class SlackMeetingHandler(slack_views.SlackAccessMixin, slack_views.SlackRequest
         super(SlackMeetingHandler, self).__init__(*args, **kwargs)
 
 
-class SlackTakeLeaveHandler(SlackMeetingHandler, TakeLeaveView):
+class SlackTakeLeaveHandler(slack_views.SlackUpdateMixin,
+                            SlackMeetingHandler, TakeLeaveView):
+
+    submit_label = "Request"
 
     def get_object(self):
         return self.model.objects.get(
@@ -346,100 +349,48 @@ class SlackTakeLeaveHandler(SlackMeetingHandler, TakeLeaveView):
             member=self.request.user.member,
         )
 
-    def action(self, callback_id, name, value):
-        try:
-            self.object = self.get_object()
-        except models.MeetingAttendance.DoesNotExist:
-            return SimpleTextResponse(
-                "Sorry, I cannot find your attendance record. " +
-                "Maybe you are not expected to present in this meeting?")
+    def get_dialog_title(self):
+        return self.meeting.date.strftime('Take Leave (%m/%d)')
 
-        # Emulate the GET behavior of the original website
-        self.request.method = 'GET'
-        form = self.get_form()
+    def form_valid(self, form):
+        super(SlackTakeLeaveHandler, self).form_valid(form)
 
-        slack = Slack()
-        slack('dialog.open', trigger_id=self.payload['trigger_id'], dialog={
-            'callback_id': callback_id,
-            'title': self.meeting.date.strftime('Take Leave (%m/%d)'),
-            'submit_label': 'Request',
-            'elements': [
+        async('meeting.tasks.run_slack', 'chat.postEphemeral',
+            channel=settings.SLACK_MEETING_CHANNEL,
+            text="OK, I've confirmed your request to take leave on %s." % (
+                unicode(self.meeting.date)),
+            user=self.payload['user']['id'],
+            attachments=[
                 {
-                    'label': form['reason'].label,
-                    'name': form['reason'].html_name,
-                    'type': 'textarea',
-                    'max_length': 500,
-                    'min_length': 1,
-                    'hint': ("You should have requested a leave to " +
-                             "the advisor before filling this form to " +
-                             "finish the process to take leave."),
-                    'placeholder': "Describe your reason in detail",
-                    'value': form['reason'].value(),
-                },
-                {
-                    'label': 'Email Notification',
-                    'name': form['email_notification'].html_name,
-                    'type': 'select',
-                    'placeholder': "Send a notification to everyone",
-                    'options': [
+                    'pretext': "Here are your submission detail",
+                    'fallback': self.object.reason,
+                    'author_name': self.object.member.name,
+                    'author_icon': _url(self.object.member.get_picture_url()),
+                    'fields': [
                         {
-                            'label': "Yes, send it.",
-                            'value': 'true',
+                            'title': "Meeting",
+                            'value': unicode(self.meeting),
+                            'short': True,
                         },
                         {
-                            'label': "No, don't notify.",
-                            'value': 'false',
+                            'title': "Attendance Status",
+                            'value': self.object.get_status_display(),
+                            'short': True,
+                        },
+                        {
+                            'title': "Reason",
+                            'value': self.object.reason,
+                            'short': False,
                         },
                     ],
                 },
             ],
-        })
+        )
 
-        return HttpResponse()
-
-    def submission(self, callback_id, submission):
-        # Emulate a form submission through POST method.
-        self.request.POST = submission
-        self.request.method = 'POST'
-        self.object = self.get_object()
-        form = self.get_form()
-
-        if form.is_valid():
-            self.form_valid(form)
-
-            async('meeting.tasks.run_slack', 'chat.postEphemeral',
-                channel=settings.SLACK_MEETING_CHANNEL,
-                text="OK, I've confirmed your request to take leave on %s." % (
-                    unicode(self.meeting.date)),
-                user=self.payload['user']['id'],
-                attachments=[
-                    {
-                        'pretext': "Here are your submission detail",
-                        'fallback': self.object.reason,
-                        'author_name': self.object.member.name,
-                        'author_icon': _url(self.object.member.get_picture_url()),
-                        'fields': [
-                            {
-                                'title': "Meeting",
-                                'value': unicode(self.meeting),
-                                'short': True,
-                            },
-                            {
-                                'title': "Attendance Status",
-                                'value': self.object.get_status_display(),
-                                'short': True,
-                            },
-                            {
-                                'title': "Reason",
-                                'value': self.object.reason,
-                                'short': False,
-                            },
-                        ],
-                    },
-                ],
-            )
-
-            return HttpResponse()
-        else:
-            # This shall never happen.
-            raise RuntimeError("Forget it")
+    def action(self, *args, **kwargs):
+        try:
+            return super(SlackTakeLeaveHandler, self).action(*args, **kwargs)
+        except models.MeetingAttendance.DoesNotExist:
+            return SimpleTextResponse(
+                "Sorry, I cannot find your attendance record. " +
+                "Maybe you are not expected to present in this meeting?")
