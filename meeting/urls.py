@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^attendance/statistic/$', views.AttendanceStatView.as_view(), name='attendance'),
     url(r'^attendance/(?P<slug>\d{4}-\d{2}-\d{2})/update$', views.AttendanceEditView.as_view(), name='attendance-update'),
     url(r'^attendance/(?P<meeting>\d{4}-\d{2}-\d{2})/leave$', views.TakeLeaveView.as_view(), name='take-leave'),
+    url(r'^slack-request$', views.SlackMeetingDispatcher.as_view()),
     url(r'^$', RedirectView.as_view(pattern_name='meeting:schedule')),
 ]
 

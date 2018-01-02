@@ -4,7 +4,7 @@ from django.urls import reverse
 from django.db.models import ExpressionWrapper, CharField, Value as V, F, Max, Case, When, Sum, IntegerField
 from django.db.models.functions import Concat
 from django.dispatch import receiver
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.forms import widgets, modelformset_factory
 from django.conf import settings
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
@@ -13,6 +13,8 @@ from django.template.loader import render_to_string
 from django.contrib.staticfiles.templatetags.staticfiles import static
 from django_tables2 import SingleTableView
 from django_q.tasks import async
+from integrations.slack import views as slack_views, Slack
+from integrations.slack.helpers import SimpleTextResponse
 from datetime import timedelta, date
 from . import tables, models, forms, filters
 from website import models as website_models
@@ -309,17 +311,13 @@ class AttendanceStatView(LoginRequiredMixin, TemplateView):
 def _url(url):
     return settings.BASE_URL + url
 
-def slack_meeting_receiver(fn):
-    from integrations.slack.signals import slack_request
-    from integrations.slack.views import SimpleTextResponse
-    from social_django.models import UserSocialAuth
+class SlackMeetingDispatcher(slack_views.SlackRequestDispatcher):
 
-    @receiver(slack_request)
-    def recv(signal, sender, **kwargs):
-        if kwargs['callback_id'][:8] != 'meeting_':
+    def dispatch(self, callback_id):
+        if callback_id[:8] != 'meeting_':
             return
 
-        _, slug, action = kwargs['callback_id'].split('_')
+        _, slug, action = callback_id.split('_')
 
         try:
             meeting = models.MeetingHistory.objects.get(date=slug)
@@ -328,50 +326,42 @@ def slack_meeting_receiver(fn):
                     "Sorry, I cannot find this meeting record." +
                     "Maybe something went wrong. :(")
 
-        slack_user = UserSocialAuth.get_social_auth(
-            provider='slack',
-            uid=kwargs['payload']['user']['id'],
+        if action == 'take-leave':
+            return SlackTakeLeaveHandler(meeting)
+        return None
+
+
+class SlackMeetingHandler(slack_views.SlackAccessMixin, slack_views.SlackRequestHandler):
+
+    def __init__(self, meeting, *args, **kwargs):
+        self.meeting = meeting
+        super(SlackMeetingHandler, self).__init__(*args, **kwargs)
+
+
+class SlackTakeLeaveHandler(SlackMeetingHandler, TakeLeaveView):
+
+    def get_object(self):
+        return self.model.objects.get(
+            meeting=self.meeting,
+            member=self.request.user.member,
         )
-        if slack_user == None:
+
+    def action(self, callback_id, name, value):
+        try:
+            self.object = self.get_object()
+        except models.MeetingAttendance.DoesNotExist:
             return SimpleTextResponse(
-                "Sorry, I cannot verify your identity.\n" +
-                "Make sure you have an account on " + settings.BASE_URL)
+                "Sorry, I cannot find your attendance record. " +
+                "Maybe you are not expected to present in this meeting?")
 
-        kwargs['request'].user = slack_user.user
-        return fn(meeting=meeting, action=action, **kwargs)
-
-    return recv
-
-@slack_meeting_receiver
-def slack_take_leave(meeting, action, payload, request, **kwargs):
-    if action != 'take-leave':
-        return
-
-    from integrations.slack.views import SimpleTextResponse
-    from integrations.slack import Slack
-    from django.http import HttpResponse
-
-    try:
-        record = models.MeetingAttendance.objects.get(
-            meeting=meeting,
-            member=request.user.member,
-        )
-    except models.MeetingAttendance.DoesNotExist:
-        return SimpleTextResponse(
-            "Sorry, I cannot find your attendance record. " +
-            "Maybe you are not expected to present in this meeting?")
-
-    view = TakeLeaveView(request=request, args=[], kwargs={}, object=record)
-
-    if 'actions' in payload and payload['actions'][0]['value'] == 'open-modal':
         # Emulate the GET behavior of the original website
-        request.method = 'GET'
-        form = view.get_form()
+        self.request.method = 'GET'
+        form = self.get_form()
 
         slack = Slack()
-        slack('dialog.open', trigger_id=payload['trigger_id'], dialog={
-            'callback_id': kwargs['callback_id'],
-            'title': meeting.date.strftime('Take Leave (%m/%d)'),
+        slack('dialog.open', trigger_id=self.payload['trigger_id'], dialog={
+            'callback_id': callback_id,
+            'title': self.meeting.date.strftime('Take Leave (%m/%d)'),
             'submit_label': 'Request',
             'elements': [
                 {
@@ -407,43 +397,41 @@ def slack_take_leave(meeting, action, payload, request, **kwargs):
 
         return HttpResponse()
 
-    elif payload.get('type', None) == 'dialog_submission':
+    def submission(self, callback_id, submission):
         # Emulate a form submission through POST method.
-        request.POST = payload['submission']
-        request.method = 'POST'
-        form = view.get_form()
+        self.request.POST = submission
+        self.request.method = 'POST'
+        self.object = self.get_object()
+        form = self.get_form()
 
         if form.is_valid():
-            view.form_valid(form)
-            record = view.object
+            self.form_valid(form)
 
             async('meeting.tasks.run_slack', 'chat.postEphemeral',
                 channel=settings.SLACK_MEETING_CHANNEL,
-                icon_url=_url(static('slack/presentation.png')),
-                username='Meeting Bot',
                 text="OK, I've confirmed your request to take leave on %s." % (
-                    unicode(meeting.date)),
-                user=payload['user']['id'],
+                    unicode(self.meeting.date)),
+                user=self.payload['user']['id'],
                 attachments=[
                     {
                         'pretext': "Here are your submission detail",
-                        'fallback': record.reason,
-                        'author_name': record.member.name,
-                        'author_icon': _url(record.member.get_picture_url()),
+                        'fallback': self.object.reason,
+                        'author_name': self.object.member.name,
+                        'author_icon': _url(self.object.member.get_picture_url()),
                         'fields': [
                             {
                                 'title': "Meeting",
-                                'value': unicode(meeting),
+                                'value': unicode(self.meeting),
                                 'short': True,
                             },
                             {
                                 'title': "Attendance Status",
-                                'value': record.get_status_display(),
+                                'value': self.object.get_status_display(),
                                 'short': True,
                             },
                             {
                                 'title': "Reason",
-                                'value': record.reason,
+                                'value': self.object.reason,
                                 'short': False,
                             },
                         ],

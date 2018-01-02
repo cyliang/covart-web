@@ -18,13 +18,11 @@ from django.conf.urls.static import static
 from django.conf import settings
 from django.contrib import admin
 from django.views.generic import RedirectView
-from integrations.slack.views import slack_interaction
 
 urlpatterns = [
     url(r'^meeting/', include('meeting.urls')),
     url(r'^asset/', include('asset.urls')),
     url(r'^', include('website.urls')),
-    url(r'^slack/request$', slack_interaction()),
     url(r'^oauth/', include('social_django.urls', namespace='social')),
     url(r'^', include('django.contrib.auth.urls')),
     url(r'^admin/login', RedirectView.as_view(pattern_name='login', query_string=True)),
