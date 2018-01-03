@@ -4,15 +4,28 @@ from django.core.exceptions import ImproperlyConfigured, NON_FIELD_ERRORS
 from django.dispatch.dispatcher import NO_RECEIVERS
 from django.views.decorators import http as http_decorators, csrf as csrf_decorators
 from django.forms import widgets, fields
-from . import signals, Slack
+from . import Slack, async_call_slack
 from .helpers import SimpleTextResponse
 import json
 
 class SlackRequestDispatcher(object):
+    """
+    Each subclass of this class handles a Slack app.
+
+    The classmethod as_view returns a view that can be used to configure the
+    URL dispatcher to process the request from Slack.
+    For example, if your Slack request URL is /slack/request
+    add an entry to urls.py: url(r'^slack/request$', YourSubClass.as_view())
+    """
     verification_token = None
 
     @classmethod
     def as_view(cls, verification_token=None, **initargs):
+        """
+        Return a view to process request from Slack.
+        Specify the verification_token to verify each request. If the token
+        is not provided, this method use SLACK_VERIFY_TOKEN in your settings.
+        """
         verification_token = (
             verification_token or cls.verification_token or
             getattr(settings, 'SLACK_VERIFY_TOKEN', None))
@@ -69,6 +82,13 @@ class SlackRequestDispatcher(object):
 
 
 class SlackRequestHandler(object):
+    """
+    SlackRequestHandler handles requests dispatched from SlackRequestDispatcher.
+    Override methods `action` and `submission` to process responsive requests.
+    """
+
+    slack_token = None
+    """ If not specified, the default one in the settings will be used. """
 
     def dispatch(self, request, callback_id, payload):
         """
@@ -109,8 +129,32 @@ class SlackRequestHandler(object):
             "An 'dialog_submission' request is received but the handler is " +
             "not implemented.")
 
+    def post_ephemeral_response(self, text, **kwargs):
+        """
+        A helper to asynchronously post a ephemeral response to the channel/user
+        that triggers the request.
+        Customization may be made through specifying kwargs of this method. For
+        example, you can specify attachments.
+        """
+        kwargs.setdefault('channel', self.payload['channel']['id'])
+        kwargs.setdefault('user', self.payload['user']['id'])
+
+        self.call_slack('chat.postEphemeral', text=text, **kwargs)
+
+    def call_slack(self, *args, **kwargs):
+        """
+        A helper to asynchronously make a Slack API call.
+        """
+        kwargs.setdefault('token', self.slack_token)
+        async_call_slack(*args, **kwargs)
+
 
 class SlackAccessMixin(object):
+    """
+    If you have 'social_django' installed in your packages, this mixin can help
+    identify the Slack user and map hime to django's builtin user, just as if he
+    has logined this site.
+    """
 
     def dispatch(self, request, callback_id, payload):
         try:
@@ -125,6 +169,7 @@ class SlackAccessMixin(object):
             pass
 
         if user != None:
+            # Treat the Slack user as if he has logined this site.
             self.user = user
             request.user = user
         return super(SlackAccessMixin, self).dispatch(
@@ -188,6 +233,9 @@ class SlackFormMixin(object):
             ]})
 
     def get_form_kwargs(self):
+        # This is overriden because we are not using request.method to
+        # recognize whether the user is currently viewing or submiting the form.
+        # Instead, we use self.slack_method for that.
         kwargs = super(SlackFormMixin, self).get_form_kwargs()
 
         if self.slack_method == 'action':
@@ -203,6 +251,9 @@ class SlackFormMixin(object):
         return kwargs
 
     def open_dialog(self):
+        """
+        Open the Slack dialog modal to display the form.
+        """
         dialog={
             'callback_id': self.callback_id,
             'title': self.get_dialog_title(),
@@ -213,13 +264,16 @@ class SlackFormMixin(object):
         if submit_label != None:
             dialog['submit_label'] = submit_label
 
-        slack = Slack()
-        slack('dialog.open',
+        self.call_slack('dialog.open',
             trigger_id=self.payload['trigger_id'],
             dialog=dialog,
         )
 
     def get_dialog_title(self):
+        """
+        Override this method to customize the dialog title, which can contain
+        maximum 24 characters.
+        """
         if len(self.dialog_title) > 24:
             raise ImproperlyConfigured(
                 "The dialog title is too long. " +
@@ -227,6 +281,10 @@ class SlackFormMixin(object):
         return self.dialog_title
 
     def get_submit_label(self):
+        """
+        Override this method to customize the submit label, which can contain
+        only single word and maximum 24 characters.
+        """
         if self.submit_label == None:
             return None
         if len(self.submit_label) > 24 or ' ' in self.submit_label:
@@ -253,6 +311,9 @@ class SlackFormMixin(object):
         return {}
 
     def get_form_fields(self):
+        """
+        Transform each field in the form into Slack dialog's element.
+        """
         form = self.get_form()
         if len(form.fields) > 5:
             raise ValueError(
@@ -321,12 +382,22 @@ class SlackFormMixin(object):
 
 
 class SlackModelFormMixin(SlackFormMixin):
+    """
+    Append ModelFormView with this mixin.
+    """
 
     def get_object(self):
+        """
+        Override this method to return single object this request mentions
+        about.
+        """
         raise NotImplementedError("This method shall be reimplemented")
 
 
 class SlackCreateMixin(SlackModelFormMixin):
+    """
+    Append CreateView with this mixin.
+    """
 
     def action(self, callback_id, name, value):
         self.object = None
@@ -338,6 +409,9 @@ class SlackCreateMixin(SlackModelFormMixin):
 
 
 class SlackUpdateMixin(SlackModelFormMixin):
+    """
+    Append UpdateView with this mixin.
+    """
 
     def action(self, callback_id, name, value):
         self.object = self.get_object()

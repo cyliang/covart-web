@@ -21,11 +21,6 @@ def _get_gcal():
     from integrations.google import GoogleCalendar
     return GoogleCalendar()
 
-def run_slack(*args, **kwargs):
-    from integrations.slack import Slack
-    slack = Slack()
-    return slack(*args, **kwargs)
-
 def sync_meeting_with_slack(meeting):
     try:
         meeting = models.MeetingHistory.objects.get(pk=meeting.pk)

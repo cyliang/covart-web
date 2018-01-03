@@ -5,6 +5,11 @@ from slackclient.client import SlackClient
 class Slack(object):
 
     def __init__(self, channel=None, token=None):
+        """
+        Instantiate a Slack API caller wrapper.
+        Specify `channel` to set default channel for future API calls.
+        If token is not specified, the one in your settings will be used.
+        """
         token = token or getattr(settings, 'SLACK_TOKEN', None)
         if channel:
             self.channel = channel
@@ -27,5 +32,28 @@ class Slack(object):
         return resp
 
     def delete_message(self, ts):
+        """
+        A quick helper to delete a message.
+        """
         return self("chat.delete", ts=ts)
 
+def call_slack(*args, **kwargs):
+    """
+    A quick utility to make one Slack API call.
+    If token is not specified in kwargs, the one in your settings will be used.
+    """
+    slack = Slack(token=kwargs.pop('token', None))
+    return slack(*args, **kwargs)
+
+def async_call_slack(*args, **kwargs):
+    """
+    Try to call Slack API in asynchronous way if there is a cluster configured
+    with Django Q; otherwise, fallback to synchronous call.
+    If token is not specified in kwargs, the one in your settings will be used.
+    """
+    try:
+        from django_q.tasks import async
+        async(call_slack, *args, **kwargs)
+    except ImportError:
+        # Fallback to synchronous call
+        call_slack(*args, **kwargs)

@@ -366,12 +366,9 @@ class SlackPresentUpdateHandler(slack_views.SlackUpdateMixin,
 
     def form_valid(self, form):
         super(SlackPresentUpdateHandler, self).form_valid(form)
-
-        async('meeting.tasks.run_slack', 'chat.postEphemeral',
-            channel=settings.SLACK_MEETING_CHANNEL,
-            text="OK, I've updated your presentation content for %s." % (
+        self.post_ephemeral_response(
+            "OK, I've updated your presentation content for %s." % (
                 unicode(self.meeting.date)),
-            user=self.payload['user']['id'],
         )
 
 
@@ -404,12 +401,9 @@ class SlackTakeLeaveHandler(slack_views.SlackUpdateMixin,
 
     def form_valid(self, form):
         super(SlackTakeLeaveHandler, self).form_valid(form)
-
-        async('meeting.tasks.run_slack', 'chat.postEphemeral',
-            channel=settings.SLACK_MEETING_CHANNEL,
-            text="OK, I've confirmed your request to take leave on %s." % (
+        self.post_ephemeral_response(
+            "OK, I've confirmed your request to take leave on %s." % (
                 unicode(self.meeting.date)),
-            user=self.payload['user']['id'],
             attachments=[
                 {
                     'pretext': "Here are your submission detail",
