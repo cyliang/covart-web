@@ -59,7 +59,8 @@ def async_call_slack(*args, **kwargs):
         # Fallback to synchronous call
         call_slack(*args, **kwargs)
     else:
-        kwargs.setdefault('hook', _async_hook)
+        kwargs.setdefault('hook', ('%s.%s' % (
+            _async_hook.__module__, _async_hook.__name__)))
         async(call_slack, *args, **kwargs)
 
 def _async_hook(task):
