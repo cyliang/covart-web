@@ -42,8 +42,16 @@ def call_slack(*args, **kwargs):
     A quick utility to make one Slack API call.
     If token is not specified in kwargs, the one in your settings will be used.
     """
-    slack = Slack(token=kwargs.pop('token', None))
-    return slack(*args, **kwargs)
+    no_exeception = kwargs.pop('no_exeception', False)
+
+    try:
+        slack = Slack(token=kwargs.pop('token', None))
+        return slack(*args, **kwargs)
+    except Exception as e:
+        if no_exeception:
+            return e.message
+        else:
+            raise
 
 def async_call_slack(*args, **kwargs):
     """
@@ -59,13 +67,4 @@ def async_call_slack(*args, **kwargs):
         # Fallback to synchronous call
         call_slack(*args, **kwargs)
     else:
-        kwargs.setdefault('hook', ('%s.%s' % (
-            _async_hook.__module__, _async_hook.__name__)))
-        async(call_slack, *args, **kwargs)
-
-def _async_hook(task):
-    """
-    Make every finished task success to prevent retrying because retrying is
-    often useless anyway.
-    """
-    task.success = True
+        async(call_slack, no_exeception=True, *args, **kwargs)
