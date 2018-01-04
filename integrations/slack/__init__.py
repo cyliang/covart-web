@@ -50,10 +50,21 @@ def async_call_slack(*args, **kwargs):
     Try to call Slack API in asynchronous way if there is a cluster configured
     with Django Q; otherwise, fallback to synchronous call.
     If token is not specified in kwargs, the one in your settings will be used.
+
+    You can also specify `hook` to do post-call actions.
     """
     try:
         from django_q.tasks import async
-        async(call_slack, *args, **kwargs)
     except ImportError:
         # Fallback to synchronous call
         call_slack(*args, **kwargs)
+    else:
+        kwargs.setdefault('hook', _async_hook)
+        async(call_slack, *args, **kwargs)
+
+def _async_hook(task):
+    """
+    Make every finished task success to prevent retrying because retrying is
+    often useless anyway.
+    """
+    task.success = True

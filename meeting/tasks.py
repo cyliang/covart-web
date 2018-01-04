@@ -109,6 +109,14 @@ def sync_meeting_with_slack(meeting):
                 "name": "take-leave",
                 "value": "open-modal",
                 "style": "danger",
+                "confirm": {
+                    "title": "Take Leave",
+                    "text": ("You should have requested a leave to the " +
+                        "advisor before filling this form to finish the " +
+                        "process to take leave."),
+                    "ok_text": "Request",
+                    "dismiss_text": "Cancel",
+                },
             },
         ],
     }]
