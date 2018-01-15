@@ -178,7 +178,7 @@ class Publication(models.Model):
                 obj.year = int(info['year'])
                 obj.paper_type = info['type']
                 obj.dblp_key = info['key']
-                obj.doi = info['doi']
+                obj.doi = info.get('doi', '')
                 obj.slug = slugify(obj.title)[:50]
 
                 return obj
